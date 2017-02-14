@@ -36,43 +36,43 @@ const struct pax_feature_entry pax_features[] = {
 	{
 		"aslr",	
 		{
-			[disable] = "hbsd.pax.aslr",
-			[enable]  = "hbsd.pax.noaslr",
+			[disable] = "hbsd.pax.noaslr",
+			[enable]  = "hbsd.pax.aslr",
 		},
 	},
 	{
 		"segvguard",	
 		{
-			[disable] = "hbsd.pax.segvguard",
-			[enable]  = "hbsd.pax.nosegvguard",
+			[disable] = "hbsd.pax.nosegvguard",
+			[enable]  = "hbsd.pax.segvguard",
 		},
 	},
 	{
 		"pageexec",	
 		{
-			[disable] = "hbsd.pax.pageexec",
-			[enable]  = "hbsd.pax.nopageexec",
+			[disable] = "hbsd.pax.nopageexec",
+			[enable]  = "hbsd.pax.pageexec",
 		},
 	},
 	{
 		"mprotect",	
 		{
-			[disable] = "hbsd.pax.mprotect",
-			[enable]  = "hbsd.pax.nomprotect",
+			[disable] = "hbsd.pax.nomprotect",
+			[enable]  = "hbsd.pax.mprotect",
 		},
 	},
 	{
 		"shlibrandom",	
 		{
-			[disable] = "hbsd.pax.shlibrandom",
-			[enable]  = "hbsd.pax.noshlibrandom",
+			[disable] = "hbsd.pax.noshlibrandom",
+			[enable]  = "hbsd.pax.shlibrandom",
 		},
 	},
 	{
 		"disallow_map32bit",	
 		{
-			[disable] = "hbsd.pax.disallow_map32bit",
-			[enable]  = "hbsd.pax.nodisallow_map32bit",
+			[disable] = "hbsd.pax.nodisallow_map32bit",
+			[enable]  = "hbsd.pax.disallow_map32bit",
 		},
 	},
 	{NULL, {0, 0}}
@@ -151,8 +151,8 @@ enable_disable(int argc, char **argv, int state)
 				printf("%s %s on %s\n",
 				    state ? "enable" : "disable",
 				    pax_features[i].feature, file);
-			set_fsea(pax_features[i].entry[disable], file, state);
-			set_fsea(pax_features[i].entry[enable], file, !state);
+			set_fsea(pax_features[i].entry[disable], file, !state);
+			set_fsea(pax_features[i].entry[enable], file, state);
 		}
 	}
 
