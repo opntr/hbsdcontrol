@@ -24,62 +24,6 @@ static int enable_cb(int argc, char **argv);
 static int disable_cb(int argc, char **argv);
 static int reset_cb(int argc, char **argv);
 
-enum pax_features_state {
-	disable = 0,
-	enable = 1
-};
-
-struct pax_feature_entry {
-	const char	*feature;
-	const char	*entry[2];
-};
-
-const struct pax_feature_entry pax_features[] = {
-	{
-		"aslr",	
-		{
-			[disable] = "hbsd.pax.noaslr",
-			[enable]  = "hbsd.pax.aslr",
-		},
-	},
-	{
-		"segvguard",	
-		{
-			[disable] = "hbsd.pax.nosegvguard",
-			[enable]  = "hbsd.pax.segvguard",
-		},
-	},
-	{
-		"pageexec",	
-		{
-			[disable] = "hbsd.pax.nopageexec",
-			[enable]  = "hbsd.pax.pageexec",
-		},
-	},
-	{
-		"mprotect",	
-		{
-			[disable] = "hbsd.pax.nomprotect",
-			[enable]  = "hbsd.pax.mprotect",
-		},
-	},
-	{
-		"shlibrandom",	
-		{
-			[disable] = "hbsd.pax.noshlibrandom",
-			[enable]  = "hbsd.pax.shlibrandom",
-		},
-	},
-	{
-		"disallow_map32bit",	
-		{
-			[disable] = "hbsd.pax.nodisallow_map32bit",
-			[enable]  = "hbsd.pax.disallow_map32bit",
-		},
-	},
-	{NULL, {0, 0}}
-};
-
 struct hbsdcontrol_command_entry {
 	const char	*cmd;
 	const int	 min_argc;
