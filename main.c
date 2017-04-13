@@ -60,16 +60,7 @@ enable_disable(int argc, char **argv, int state)
 	feature = argv[1];
 	file = argv[2];
 
-	for (i = 0; pax_features[i].feature != NULL; i++) {
-		if (!strcmp(pax_features[i].feature, feature)) {
-			if (flag_verbose) 
-				printf("%s %s on %s\n",
-				    state ? "enable" : "disable",
-				    pax_features[i].feature, file);
-			hbsdcontrol_set_extattr(file, pax_features[i].entry[disable], !state);
-			hbsdcontrol_set_extattr(file, pax_features[i].entry[enable], state);
-		}
-	}
+	hbsdcontrol_set_feature_state(file, feature, state);
 
 	return (0);
 }

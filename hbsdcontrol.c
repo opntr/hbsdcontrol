@@ -114,3 +114,28 @@ hbsdcontrol_rm_extattr(const char *file, const char *feature)
 	return (error);
 }
 
+int
+hbsdcontrol_set_feature_state(const char *file, const char *feature, enum pax_feature_state state)
+{
+	int i;
+	int error;
+
+	error = 0;
+
+	for (i = 0; pax_features[i].feature != NULL; i++) {
+		if (strcmp(pax_features[i].feature, feature) == 0) {
+			if (flag_verbose) {
+				printf("%s %s on %s\n",
+				    state ? "enable" : "disable",
+				    pax_features[i].feature, file);
+			}
+
+			error = hbsdcontrol_set_extattr(file, pax_features[i].entry[disable], !state);
+			error |= hbsdcontrol_set_extattr(file, pax_features[i].entry[enable], state);
+
+			break;
+		}
+	}
+
+	return (error);
+}
