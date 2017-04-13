@@ -1,0 +1,6 @@
+*.8.gz
+*.debug
+*.depend
+*.full
+*.o
+hbsdcontrol
