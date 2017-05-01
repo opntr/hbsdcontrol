@@ -1,11 +1,3 @@
-PROG=	hbsdcontrol
-MAN=	hbsdcontrol.8
+SUBDIR= sbin/hbsdcontrol lib/libhbsdcontrol
 
-SRCS=	main.c hbsdcontrol.c
-
-INCS=	hbsdcontrol.h
-
-LIBADD=	sbuf
-LDADD=  -lsbuf
-
-.include <bsd.prog.mk>
+.include <bsd.subdir.mk>
