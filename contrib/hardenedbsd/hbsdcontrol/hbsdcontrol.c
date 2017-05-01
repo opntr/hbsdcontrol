@@ -153,7 +153,7 @@ hbsdcontrol_list_extattrs(const char *file, char **features)
 	size_t pos;
 	uint8_t len;
 
-	nbytes = 1 * 1024 * 1024; // XXXOP
+	nbytes = 0;
 	data = NULL;
 	pos = 0;
 
@@ -167,8 +167,8 @@ hbsdcontrol_list_extattrs(const char *file, char **features)
 	if (hbsdcontrol_verbose_flag)
 		printf("list attrs on file: %s\n", file);
 
-	nbytes = extattr_list_file(file, attrnamespace, NULL, nbytes);
-	if (nbytes == -1) {
+	nbytes = extattr_list_file(file, attrnamespace, NULL, 0);
+	if (nbytes < 0) {
 		error = EFAULT;
 		goto out;
 	}
