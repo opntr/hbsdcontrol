@@ -114,6 +114,91 @@ hbsdcontrol_rm_extattr(const char *file, const char *feature)
 	return (error);
 }
 
+
+int
+hbsdcontrol_list_extattrs(const char *file, char **features)
+{
+	int error;
+	int attrnamespace;
+	ssize_t nbytes;
+	char *data;
+	size_t pos;
+	uint8_t len;
+
+	nbytes = 1 * 1024 * 1024; // XXXOP
+	data = NULL;
+	pos = 0;
+
+	if (features == NULL)
+		err(-1, "%s", "features");
+
+	error = extattr_string_to_namespace("system", &attrnamespace);
+	if (error)
+		err(-1, "%s", "system");
+
+	if (hbsdcontrol_verbose_flag)
+		printf("list attrs on file: %s\n", file);
+
+	nbytes = extattr_list_file(file, attrnamespace, NULL, nbytes);
+	if (nbytes == -1) {
+		error = EFAULT;
+		goto out;
+	}
+
+	data = calloc(sizeof(char), nbytes);
+	if (data == NULL) {
+		error = ENOMEM;
+		goto out;
+	}
+
+	nbytes = extattr_list_file(file, attrnamespace, data, nbytes);
+	if (nbytes == -1) {
+		error = EFAULT;
+		goto out;
+	}
+	
+	pos = 0;
+	while (pos < nbytes) {
+		int i;
+		int j;
+		size_t attr_len;
+
+		/* see EXTATTR(2) about the data structure */
+		len = data[pos++];
+
+		/* Yes, this isn't an optimized algorithm. */
+		for (i = 0; pax_features[i].feature != NULL; i++) {
+			/* The 2 comes from enum pax_feature_state's size */
+			for (j = 0; j < 2; j++) {
+				attr_len = strlen(pax_features[i].entry[j]);
+				if (attr_len != len) {
+					/* Fast path, skip if the size of attribute differs. */
+					continue;
+				}
+
+				if (!memcmp(pax_features[i].entry[j], &data[pos], attr_len)) {
+					// entry = stdup(pax_features[i].entry[j]);
+					// list.append(entry);
+					if (hbsdcontrol_verbose_flag) {
+						printf("\tfound attribute: %s\n", pax_features[i].entry[j]);
+					} 
+				}
+
+			}
+		}
+
+		pos += len;
+	}
+
+
+	*features = NULL; // XXXOP
+
+out:
+	free(data);
+
+	return (error);
+}
+
 int
 hbsdcontrol_set_feature_state(const char *file, const char *feature, enum pax_feature_state state)
 {
@@ -160,6 +245,37 @@ hbsdcontrol_rm_feature_state(const char *file, const char *feature)
 			break;
 		}
 	}
+
+	return (error);
+}
+
+int
+hbsdcontrol_list_features(const char *file, char **features)
+{
+	int i, j;
+	int error;
+	char *attrs;
+	char *attr; // XXXOP
+
+	error = 0;
+
+	hbsdcontrol_list_extattrs(file, &attrs);
+	// XXXOP error handling
+	
+	if (attrs == NULL)
+		err(-1, "attrs == NULL");
+
+	for (attr = attrs ; attr != NULL; attr++) {
+		for (i = 0; pax_features[i].feature != NULL; i++) {
+			for (j = 0; j < 2; j++) {
+				if (!strcmp(pax_features[i].entry[j], attr)) {
+					// features.append(strcmp(pax_features[i].entry[j]e);
+				}
+			}
+		}
+	}
+
+	free(attrs);
 
 	return (error);
 }

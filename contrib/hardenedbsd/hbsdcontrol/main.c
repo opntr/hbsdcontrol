@@ -23,6 +23,7 @@ static int dummy_cb(int argc, char **argv);
 static int enable_cb(int argc, char **argv);
 static int disable_cb(int argc, char **argv);
 static int reset_cb(int argc, char **argv);
+static int list_cb(int argc, char **argv);
 
 struct hbsdcontrol_command_entry {
 	const char	*cmd;
@@ -36,7 +37,7 @@ const struct hbsdcontrol_command_entry hbsdcontrol_commands[] = {
 	{"status",	3,	dummy_cb},
 	{"reset",	3,	reset_cb},
 	{"reset-all",	2,	dummy_cb},
-	{"list",	2,	dummy_cb},
+	{"list",	2,	list_cb},
 	{NULL,		0,	NULL}
 };
 
@@ -50,7 +51,6 @@ dummy_cb(int argc, char **argv)
 static int
 enable_disable(int argc, char **argv, int state)
 {
-	int i;
 	char *feature;
 	char *file;
 
@@ -61,6 +61,23 @@ enable_disable(int argc, char **argv, int state)
 	file = argv[2];
 
 	hbsdcontrol_set_feature_state(file, feature, state);
+
+	return (0);
+}
+
+static int
+list(int argc, char **argv)
+{
+	char *feature;
+	char *file;
+	char *dummy;
+
+	if (argc < 2)
+		err(-1, "bar");
+
+	file = argv[1];
+
+	hbsdcontrol_list_features(file, &dummy);
 
 	return (0);
 }
@@ -103,6 +120,12 @@ reset_cb(int argc, char **argv)
 	return (rm_fsea(argc, argv));
 }
 
+static int
+list_cb(int argc, char **argv)
+{
+
+	return (list(argc, argv));
+}
 
 static void __dead2
 usage(void)
