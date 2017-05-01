@@ -26,11 +26,12 @@
  * $FreeBSD$
  */
 
-#include <sys/types.h>
+#include <sys/param.h>
 #include <sys/sbuf.h>
 #include <sys/uio.h>
 #include <sys/extattr.h>
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -144,7 +145,7 @@ hbsdcontrol_rm_extattr(const char *file, const char *feature)
 
 
 int
-hbsdcontrol_list_extattrs(const char *file, char **features)
+hbsdcontrol_list_extattrs(const char *file, char ***features)
 {
 	int error;
 	int attrnamespace;
@@ -152,10 +153,12 @@ hbsdcontrol_list_extattrs(const char *file, char **features)
 	char *data;
 	size_t pos;
 	uint8_t len;
+	int fpos;
 
 	nbytes = 0;
 	data = NULL;
 	pos = 0;
+	fpos = 0;
 
 	if (features == NULL)
 		err(-1, "%s", "features");
@@ -179,6 +182,12 @@ hbsdcontrol_list_extattrs(const char *file, char **features)
 		goto out;
 	}
 
+	*features = (char **)calloc(sizeof(char *), nitems(pax_features) * nitems(pax_features[0].entry));
+	if (*features == NULL) {
+		error = ENOMEM;
+		goto out;
+	}
+
 	nbytes = extattr_list_file(file, attrnamespace, data, nbytes);
 	if (nbytes == -1) {
 		error = EFAULT;
@@ -190,6 +199,8 @@ hbsdcontrol_list_extattrs(const char *file, char **features)
 		int i;
 		int j;
 		size_t attr_len;
+
+		assert(fpos < nitems(pax_features) * nitems(pax_features[0].entry));
 
 		/* see EXTATTR(2) about the data structure */
 		len = data[pos++];
@@ -205,21 +216,20 @@ hbsdcontrol_list_extattrs(const char *file, char **features)
 				}
 
 				if (!memcmp(pax_features[i].entry[j], &data[pos], attr_len)) {
-					// entry = stdup(pax_features[i].entry[j]);
-					// list.append(entry);
 					if (hbsdcontrol_verbose_flag) {
 						printf("\tfound attribute: %s\n", pax_features[i].entry[j]);
-					} 
+					}
+					(*features)[fpos] = strdup(pax_features[i].entry[j]);
+					fpos++;
 				}
-
 			}
 		}
 
 		pos += len;
 	}
 
-
-	*features = NULL; // XXXOP
+	/* NULL terminate the features array. */
+	(*features)[fpos] = NULL;
 
 out:
 	free(data);
@@ -280,30 +290,35 @@ hbsdcontrol_rm_feature_state(const char *file, const char *feature)
 int
 hbsdcontrol_list_features(const char *file, char **features)
 {
-	int i, j;
+	int i, j, k;
 	int error;
-	char *attrs;
+	char **attrs;
 	char *attr; // XXXOP
 
 	error = 0;
+	attrs = NULL;
 
 	hbsdcontrol_list_extattrs(file, &attrs);
-	// XXXOP error handling
-	
 	if (attrs == NULL)
 		err(-1, "attrs == NULL");
 
-	for (attr = attrs ; attr != NULL; attr++) {
-		for (i = 0; pax_features[i].feature != NULL; i++) {
-			for (j = 0; j < 2; j++) {
-				if (!strcmp(pax_features[i].entry[j], attr)) {
+	for (i = 0; attrs[i] != NULL; i++) {
+		for (j = 0; pax_features[j].feature != NULL; j++) {
+			for (k = 0; k < 2; k++) {
+				if (!strcmp(pax_features[j].entry[k], attrs[i])) {
 					// features.append(strcmp(pax_features[i].entry[j]e);
+					printf("%s\n", attrs[i]);
 				}
 			}
 		}
 	}
 
+	for (i = 0; attrs[i] != NULL; i++) {
+		free(attrs[i]);
+		attrs[i] = NULL;
+	}
 	free(attrs);
+	attrs = NULL;
 
 	return (error);
 }
