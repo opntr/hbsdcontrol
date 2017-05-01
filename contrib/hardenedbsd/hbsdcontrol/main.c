@@ -1,3 +1,7 @@
+/*
+ * Warning: this file currently is just a stub, to test libhbsdcontrol!
+ */
+
 #include <sys/types.h>
 #include <sys/sbuf.h>
 #include <sys/uio.h>
