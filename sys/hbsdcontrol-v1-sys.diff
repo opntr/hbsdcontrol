@@ -75,10 +75,10 @@ index 34702652cf5d..2cba4532c69b 100644
  # ASLR overwritable defaults
 diff --git a/sys/hardenedbsd/hbsd_hbsdcontrol.c b/sys/hardenedbsd/hbsd_hbsdcontrol.c
 new file mode 100644
-index 000000000000..9e0b880d7024
+index 000000000000..b151c17993a4
 --- /dev/null
 +++ b/sys/hardenedbsd/hbsd_hbsdcontrol.c
-@@ -0,0 +1,269 @@
+@@ -0,0 +1,291 @@
 +/*-
 + * Copyright (c) 2015-2017 Oliver Pinter <oliver.pinter@HardenedBSD.org>
 + * All rights reserved.
@@ -181,8 +181,9 @@ index 000000000000..9e0b880d7024
 +	bool feature_present[nitems(pax_features)];
 +	unsigned char *fsea_list;
 +	size_t fsea_list_size;
++	size_t fsea_attrname_len;
 +	pax_flag_t parsed_flags;
-+	unsigned char entry_len;
++	unsigned char entry_size;
 +	int i, j;
 +	int error;
 +
@@ -194,7 +195,9 @@ index 000000000000..9e0b880d7024
 +	feature_status = 0;
 +	fsea_list = NULL;
 +	fsea_list_size = 0;
++	fsea_attrname_size = 0;
 +	parsed_flags = 0;
++
 +	for (i = 0; i < nitems(feature_present); i++)
 +		feature_present[i] = false;
 +
@@ -240,15 +243,34 @@ index 000000000000..9e0b880d7024
 +	 */
 +	for (i = 0; i < fsea_list_size; ) {
 +		/* See VOP_LISTEXTATTR(9) for the details. */
-+		entry_len = fsea_list[i++];
++		entry_size = fsea_list[i++];
 +
 +		for (j = 0; pax_features[j].fs_ea_attribute != NULL; j++) {
++			fsea_attrname_len = strlen(pax_features[j].fs_ea_attribute);
++
++			/* 
++			 * Fast path:
++			 * compare the string's len without the the ending zero
++			 * with the attribute name stored without zero.
++			 */
++			if (fsea_attrname_len != entry_size)
++				break;
++
++			/*
++			 * Compare the strings as byte arrays without the ending zeros
++			 * after we checked its lengths.
++			 */
 +			if (memcmp(pax_features[j].fs_ea_attribute, &fsea_list[i],
-+			    MIN(entry_len, strlen(pax_features[j].fs_ea_attribute))) == 0) {
++			    fsea_attrname_len) == 0) {
 +				feature_present[j] = true;
++				/*
++				 * Once we found the relevant enty,
++				 * start over a new round for a new entry.
++				 */
++				break;
 +			}
 +		}
-+		i += entry_len;
++		i += entry_size;
 +	}
 +
 +	for (i = 0; pax_features[i].fs_ea_attribute != NULL; i++) {

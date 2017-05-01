@@ -1,3 +1,12 @@
+commit 47b61aaed2c14a520b09a38e031166ca27a676ab
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Mon May 1 23:30:50 2017 +0200
+
+    HBSD: uptime the hbsdcontrol's kernel side function, and use proper nameing
+    
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
 commit bde2f5adbdd3c0d051fcdf9cc2ef7c10bff0fe29
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Mon May 1 23:04:39 2017 +0200
