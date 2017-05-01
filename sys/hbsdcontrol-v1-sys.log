@@ -1,0 +1,269 @@
+commit bde2f5adbdd3c0d051fcdf9cc2ef7c10bff0fe29
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Mon May 1 23:04:39 2017 +0200
+
+    HBSD: add short disclamer, why NOCRED is used in hbsdcontrols kernel part
+    
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit f2ffaf5cbae0d3c17e9006df26d983918ff4e7da
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Tue Jan 3 21:33:38 2017 +0100
+
+    HBSD: fix build error on 10-STABLE
+    
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit c5f7fb78b229846e52fa58be0f4003fb2a09efad
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Sun Jan 1 19:04:07 2017 +0100
+
+    HBSD: final cleanups in hbsdcontrol branch
+    
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit 9af7cb8a5be81fe82f04d9853e512cd3a3d76b67
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Wed Dec 28 14:17:10 2016 +0100
+
+    HBSD: do not query for non-existent FS-EAs
+    
+    In case when only some of hbsdcontrol related extended attributes
+    assigned to an executable, filter out the not assigend attributes
+    from list of requested from VOP_GETEXTATTR calls. With this trick
+    we can eliminate the unneeded heavyweight VOP_* functions.
+    
+    Also added a fast-path to non-existing FS-EA-s and error cases too.
+    
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit 7dc068fb0c31ad1d02678db2bcb4178d3fd0c839
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Tue Dec 27 01:05:09 2016 +0100
+
+    HBSD: simplify the option parsing from FS-EA-s in hbsdcontrol
+    
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit 598e71ccb4feab95f9bf7b75e15f051281c04cd2
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Tue Dec 27 00:55:31 2016 +0100
+
+    HBSD: fix error handling in hbsdcontrol's kernel code
+    
+    In case of ENOATTR previously the parsed_flags always zeroed out,
+    what is a wrong behaviour. This case occurs when only one property
+    is set, and it's safe to ignore this type of error.
+    
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit d3f37bdd5d7b962afc8b6a4ec570f1b7a6edaec6
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Thu Nov 17 21:40:47 2016 +0100
+
+    HBSD: use the correct option PAX_OVERRIDE_WITH_ACL
+    
+    github-issue: #30
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit a2327c59d1f08495c1e5e7802f0f7de7e481c836
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Sun Nov 6 20:08:26 2016 +0100
+
+    HBSD: document the newly added kernel knobs
+    
+    github-issue: #30
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit ace79f20df68e853af4779eba6929ef0b6177c11
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Sun Nov 6 20:06:23 2016 +0100
+
+    HBSD: added PAX_ACL and PAX_OVERRIDE_WITH_ACL to keep old behavior
+    
+    github-issue: #30
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit b96a35d6aa0948d8f408b10448f9bb39e26eb183
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Sun Nov 6 20:03:21 2016 +0100
+
+    HBSD: use the proper reference to thread in pax_hbsdcontrol_parse_fsea_flags()
+    
+    github-issue: #30
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit c184775176829726aa4438b907fb86f3b87d1965
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Sun Nov 6 20:01:37 2016 +0100
+
+    HBSD: API change, swap the first and second argument of pax_elf
+    
+    Follow the style of other parts of the code.
+    This requires a __HardenedBSD_version bump after the merge.
+    The required changes was already done in secadm's hbsdcontrol branch.
+    
+    github-issue: #30
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit b811dcb440c381e3b98decd1b1f5aa550fd8b355
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Sun Nov 6 19:54:40 2016 +0100
+
+    HBSD: allow to override hbsdcontrol's settings with secadm when allowed
+    
+    This introduces two new kernel knob:
+     * PAX_ACL - when this is included in kernel config, the default is
+       included, then you are able to use secadm, when not, the secadm
+       lost it's functionality. This is the minimum required framework
+       for secadm.
+     * PAX_OVERRIDE_WITH_ACL - once you added this knob to kernel config
+       then you are able to override the default settings or the hbsdcontrol
+       settings with secadm. Without this knob you cannot set pax settings
+       with secadm and you could use only a subset of secadms functionality.
+    
+    github-issue: #30
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit 77f477daae6ed96f4d12006113ac136cd2e54525
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Sun Nov 6 19:19:18 2016 +0100
+
+    HBSD: fix possible TOCTOU in hbsdcontrol
+    
+    As side-effect when hbsdcontrol is compiled in, then always overrides the secadm settings.
+    This is because secadm is running in exec_check_premission()'s mac_vnode_check_exec().
+    
+    github-issue: #30
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit 92f13c0dfad590d1e33a1a6cb063ccf00584b8e6
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Sun Nov 6 18:53:21 2016 +0100
+
+    HBSD: change hbsdcontrol's namespace in FS-EAs
+    
+    github-issue: #30
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit f53f9d6186800aa82444b1848af3f671c05111fc
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Sun Nov 6 18:52:24 2016 +0100
+
+    HBSD: add the ability to disable hbsdcontrol at boot time via tunable
+    
+    Set hardening.hbsdcontrol.status to 0 to disable and 1 to enable them.
+    The default is 1.
+    
+    github-issue: #30
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit 2969631f246bbdbad781f5d66021235654714fa7
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Sun Nov 6 18:49:49 2016 +0100
+
+    HBSD: remove unneeded KASSERTS and improve style in hbsdcontrol's system part
+    
+    github-issue: #30
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit 7a18030b5686d1b40e1aa21fe7e5f274cb18ce94
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Sat Jan 23 23:27:41 2016 +0100
+
+    HBSD: follow type changes in hbsdcontrol, what are introduced in v40
+    
+    MFC-to: 10-STABLE
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit c7231b84686e7d621092e96ef27d6fbac5754e45
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Tue Jan 19 22:55:18 2016 +0100
+
+    HBSD: use NOCRED instead of NULL as credential parameter in VOP_GETEXTARTTR call
+    
+    github-issue: #30
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit 2c2e910429d5df18526f4d901d839472ba9b7cb7
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Sun Jan 17 20:20:23 2016 +0100
+
+    HBSD: bump copyright year, and change SI_ORDER_FIRST to SI_ORDER_SECOND
+    
+    github-issue: #30
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit a755f63294d54639d08abfe537cc50fddcb2969b
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Thu Jan 14 23:34:26 2016 +0100
+
+    HBSD: drop the check against credentials when try to pull in pax settings
+    
+    This fixes the case, when running program with special settings other than root user.
+    
+    github-isue: #30
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit 1553167bc4ade7110a203f46a20a1596da52f800
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Sat Jan 9 15:18:33 2016 +0100
+
+    HBSD: simplify the FS-EA handling
+    
+    The best would be to move the whole setup after the
+    exec_check_permissions function, to properly close the TOCTOU,
+    but first I like to test the overall scenario.
+    
+    github-issue: #30
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit d1f5b4523a7f1854d56a9f4f9a9dfa293711a38d
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Sat Dec 5 22:37:24 2015 +0100
+
+    HBSD: make the feature names uniform
+    
+    github-issue: #30
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit 7c815301b691313d5dd47f0cf0ec46548e007507
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Sat Dec 5 02:32:06 2015 +0100
+
+    HBSD: add basic functionality and hook in into kern_exec
+    
+    * parese the assigned options
+    * pass them to pax_elf
+    * currently missing user namespace
+    
+    github-issue: #30
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit 8c26f2cf9b5829c3598b6a8e152f33ce762736f3
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Sat Dec 5 01:51:17 2015 +0100
+
+    HBSD: add basic stubs for hbsdcontrols kernel site implementation
+    
+    github-issue: #30
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
