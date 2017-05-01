@@ -1,8 +1,14 @@
+*.3.gz
 *.8.gz
 *.debug
 *.depend
 *.full
+*.a
 *.o
 *.po
 *.pico
+*.so
+*.so.[0-9]*
+*.swp
 ^hbsdcontrol$
+sbin/hbsdcontrol/hbsdcontrol
