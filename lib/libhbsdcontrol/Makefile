@@ -14,5 +14,6 @@ MAN+=	${HBSDCONTROL_DIR}/libhbsdcontrol.3
 MLINKS+=	libhbsdcontrol.3	hbsdcontrol_set_extattr.3
 MLINKS+=	libhbsdcontrol.3	hbsdcontrol_rm_extattr.3
 MLINKS+=	libhbsdcontrol.3	hbsdcontrol_set_feature_state.3
+MLINKS+=	libhbsdcontrol.3	hbsdcontrol_rm_feature_state.3
 
 .include <bsd.lib.mk>

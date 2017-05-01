@@ -93,17 +93,7 @@ rm_fsea(int argc, char **argv)
 	feature = argv[1];
 	file = argv[2];
 
-	for (i = 0; pax_features[i].feature != NULL; i++) {
-		if (!strcmp(pax_features[i].feature, feature)) {
-			if (flag_verbose) 
-				printf("reset %s on %s\n",
-				    pax_features[i].feature, file);
-			hbsdcontrol_rm_extattr(file, pax_features[i].entry[disable]);
-			hbsdcontrol_rm_extattr(file, pax_features[i].entry[enable]);
-		}
-	}
-
-	return (0);
+	return (hbsdcontrol_rm_feature_state(file, feature));
 }
 
 static int

@@ -140,6 +140,30 @@ hbsdcontrol_set_feature_state(const char *file, const char *feature, enum pax_fe
 	return (error);
 }
 
+
+int
+hbsdcontrol_rm_feature_state(const char *file, const char *feature)
+{
+	int i;
+	int error;
+
+	error = 0;
+
+	for (i = 0; pax_features[i].feature != NULL; i++) {
+		if (!strcmp(pax_features[i].feature, feature)) {
+			if (hbsdcontrol_verbose_flag) 
+				printf("reset %s on %s\n",
+				    pax_features[i].feature, file);
+			error = hbsdcontrol_rm_extattr(file, pax_features[i].entry[disable]);
+			error |= hbsdcontrol_rm_extattr(file, pax_features[i].entry[enable]);
+
+			break;
+		}
+	}
+
+	return (error);
+}
+
 int
 hbsdcontrol_set_verbose(const int level)
 {
