@@ -1,0 +1,5 @@
+* rename current functions in libhbsdcontrol to *_file
+* add *_fd functions
+* rewrite the main program
+* capsicumize the main program
+* create a proper documentation
