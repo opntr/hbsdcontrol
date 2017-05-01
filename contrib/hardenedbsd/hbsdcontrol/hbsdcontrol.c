@@ -15,7 +15,7 @@
 
 #include "hbsdcontrol.h"
 
-extern int flag_verbose; // XXXOP
+static int hbsdcontrol_verbose_flag;
 
 const struct pax_feature_entry pax_features[] = {
 	{
@@ -82,7 +82,7 @@ hbsdcontrol_set_extattr(const char *file, const char *feature, const int val)
 
 	len = extattr_set_file(file, attrnamespace, feature,
 	    sbuf_data(attrval), sbuf_len(attrval));
-	if (len >= 0 && flag_verbose) // XXXOP
+	if (len >= 0 && hbsdcontrol_verbose_flag)
 		warnx("%s: %s@%s = %s", file, "system", feature, sbuf_data(attrval));
 
 	sbuf_delete(attrval);
@@ -106,7 +106,7 @@ hbsdcontrol_rm_extattr(const char *file, const char *feature)
 	if (error)
 		err(-1, "%s", "system");
 
-	if (flag_verbose)
+	if (hbsdcontrol_verbose_flag)
 		printf("reset feature: %s on file: %s\n", feature, file);
 
 	error = extattr_delete_file(file, attrnamespace, feature);
@@ -124,7 +124,7 @@ hbsdcontrol_set_feature_state(const char *file, const char *feature, enum pax_fe
 
 	for (i = 0; pax_features[i].feature != NULL; i++) {
 		if (strcmp(pax_features[i].feature, feature) == 0) {
-			if (flag_verbose) {
+			if (hbsdcontrol_verbose_flag) {
 				printf("%s %s on %s\n",
 				    state ? "enable" : "disable",
 				    pax_features[i].feature, file);
@@ -138,4 +138,13 @@ hbsdcontrol_set_feature_state(const char *file, const char *feature, enum pax_fe
 	}
 
 	return (error);
+}
+
+int
+hbsdcontrol_set_verbose(const int level)
+{
+
+	hbsdcontrol_verbose_flag = level;
+
+	return (hbsdcontrol_verbose_flag);
 }

@@ -17,4 +17,6 @@ int hbsdcontrol_set_extattr(const char *file, const char *feature, const int val
 int hbsdcontrol_rm_extattr(const char *file, const char *feature);
 int hbsdcontrol_set_feature_state(const char *file, const char *feature, enum pax_feature_state state);
 
+int hbsdcontrol_set_verbose(const int level);
+
 #endif /* __HBSDCONTROL_H */

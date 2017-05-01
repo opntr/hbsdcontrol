@@ -148,6 +148,7 @@ main(int argc, char **argv)
 			break;
 		case 'v':
 			flag_verbose < 3 ? flag_verbose++ : 0;
+			hbsdcontrol_set_verbose(flag_verbose);
 			break;
 		case 'h':
 		default:
