@@ -3,4 +3,6 @@
 *.depend
 *.full
 *.o
-hbsdcontrol
+*.po
+*.pico
+^hbsdcontrol$
