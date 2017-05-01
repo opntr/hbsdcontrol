@@ -1,0 +1,79 @@
+.\"-
+.\" Copyright (c) 2017 Olivér Pintér
+.\" All rights reserved.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\" $HardenedBSD$
+.\"
+.Dd May 1, 2017
+.Dt LIBHBSDCONTROL 3
+.Os
+.Sh NAME
+.Nm hbsdcontrol_set_extattr , hbsdcontrol_rm_extattr , hbsdcontrol_set_feature_state
+.Nd "interface for accessing the HardenedBSD's feature state control variables"
+.Sh LIBRARY
+.Lb libhsdcontrol
+.Sh SYNOPSIS
+.In libhbsdcontrol.h
+.Ft int
+.Fo hbsdcontrol_set_extattr
+.Fa "const char *file" "const char *feature" "const char int val"
+.Fc
+.Ft int
+.Fo hbsdcontrol_rm_extattr
+.Fa "const char *file" "const char *feature"
+.Fc
+.Ft int
+.Fo hbsdcontrol_set_feature_state
+.Fa "const char *file" "const char *feature" "enum pax_feature_state"
+.Fc
+.Fc
+.Sh DESCRIPTION
+The
+.Nm libhbsdcontrol
+library provides access to a special attributes which stored in file systems
+extended attributes.
+.Pp
+The
+.Fn hbsdcontrol_set_extattr
+function is used to set the specific file system attribute on file.
+The
+.Fa file
+parameter needs to be set to the target file path, where the
+.Fa feature
+attriube will be created with the 
+.Fa val
+value.
+.El
+.Sh SEE ALSO
+.Xr elf 3 ,
+.Xr security 7
+.Sh HISTORY
+The
+.Nm libhbsdcontrol
+library first appeared in HardenedBSD 11.1.
+.Sh AUTHORS
+The
+.Nm libhbsdcontrol
+library and this manual page were written by
+.An Oliver Pinter Aq Mt oliver.pinter@HardenedBSD.org .
