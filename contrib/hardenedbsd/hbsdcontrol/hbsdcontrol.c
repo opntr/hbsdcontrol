@@ -125,6 +125,53 @@ hbsdcontrol_set_extattr(const char *file, const char *attr, const int val)
 	return (0);
 }
 
+int
+hbsdcontrol_get_extattr(const char *file, const char *attr, int *val)
+{
+	int	error;
+	int	len;
+	int	attrnamespace;
+	char	*attrval = NULL;
+
+	if (val == NULL) {
+		err(-1, "%s", "val");
+	}
+
+	error = extattr_string_to_namespace("system", &attrnamespace);
+	if (error)
+		err(-1, "%s", "system");
+
+	len = extattr_get_file(file, attrnamespace, attr, NULL, 0);
+	if (len == -1) {
+		perror(__func__);
+		errx(-1, "abort");
+	}
+
+#if 0
+	if (len >= 0 && hbsdcontrol_verbose_flag)
+		warnx("%s: %s@%s = %s", file, "system", attr, sbuf_data(attrval));
+#endif
+
+	attrval = calloc(sizeof(char), len);
+	if (attrval == NULL) {
+		perror(__func__);
+		errx(-1, "abort");
+	}
+
+	len = extattr_get_file(file, attrnamespace, attr, attrval, len);
+	if (len == -1) {
+		perror(__func__);
+		errx(-1, "abort");
+	}
+
+	// XXXOP
+	*val = *attrval - '0';
+
+	free(attrval);
+
+	return (0);
+}
+
 
 int
 hbsdcontrol_rm_extattr(const char *file, const char *attr)
