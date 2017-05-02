@@ -48,53 +48,54 @@ static int hbsdcontrol_verbose_flag;
 
 const struct pax_feature_entry pax_features[] = {
 	{
-		"aslr",
-		{
+		.feature = "aslr",
+		.extattr = {
 			[disable] = "hbsd.pax.noaslr",
 			[enable]  = "hbsd.pax.aslr",
 		},
 	},
 	{
-		"segvguard",
-		{
+		.feature = "segvguard",
+		.extattr = {
 			[disable] = "hbsd.pax.nosegvguard",
 			[enable]  = "hbsd.pax.segvguard",
 		},
 	},
 	{
-		"pageexec",
-		{
+		.feature = "pageexec",
+		.extattr = {
 			[disable] = "hbsd.pax.nopageexec",
 			[enable]  = "hbsd.pax.pageexec",
 		},
 	},
 	{
-		"mprotect",
-		{
+		.feature = "mprotect",
+		.extattr = {
 			[disable] = "hbsd.pax.nomprotect",
 			[enable]  = "hbsd.pax.mprotect",
 		},
 	},
 	{
-		"shlibrandom",
-		{
+		.feature = "shlibrandom",
+		.extattr = {
 			[disable] = "hbsd.pax.noshlibrandom",
 			[enable]  = "hbsd.pax.shlibrandom",
 		},
 	},
 	{
-		"disallow_map32bit",
-		{
+		.feature = "disallow_map32bit",
+		.extattr = {
 			[disable] = "hbsd.pax.nodisallow_map32bit",
 			[enable]  = "hbsd.pax.disallow_map32bit",
 		},
 	},
+	/* Terminating NULL entry, DO NOT REMOVE! */
 	{NULL, {0, 0}}
 };
 
 	
 int
-hbsdcontrol_set_extattr(const char *file, const char *feature, const int val)
+hbsdcontrol_set_extattr(const char *file, const char *attr, const int val)
 {
 	int	error;
 	int	len;
@@ -109,10 +110,10 @@ hbsdcontrol_set_extattr(const char *file, const char *feature, const int val)
 	sbuf_printf(attrval, "%d", val);
 	sbuf_finish(attrval);
 
-	len = extattr_set_file(file, attrnamespace, feature,
+	len = extattr_set_file(file, attrnamespace, attr,
 	    sbuf_data(attrval), sbuf_len(attrval));
 	if (len >= 0 && hbsdcontrol_verbose_flag)
-		warnx("%s: %s@%s = %s", file, "system", feature, sbuf_data(attrval));
+		warnx("%s: %s@%s = %s", file, "system", attr, sbuf_data(attrval));
 
 	sbuf_delete(attrval);
 
@@ -126,7 +127,7 @@ hbsdcontrol_set_extattr(const char *file, const char *feature, const int val)
 
 
 int
-hbsdcontrol_rm_extattr(const char *file, const char *feature)
+hbsdcontrol_rm_extattr(const char *file, const char *attr)
 {
 	int error;
 	int attrnamespace;
@@ -136,16 +137,16 @@ hbsdcontrol_rm_extattr(const char *file, const char *feature)
 		err(-1, "%s", "system");
 
 	if (hbsdcontrol_verbose_flag)
-		printf("reset feature: %s on file: %s\n", feature, file);
+		printf("reset attr: %s on file: %s\n", attr, file);
 
-	error = extattr_delete_file(file, attrnamespace, feature);
+	error = extattr_delete_file(file, attrnamespace, attr);
 
 	return (error);
 }
 
 
 int
-hbsdcontrol_list_extattrs(const char *file, char ***features)
+hbsdcontrol_list_extattrs(const char *file, char ***attrs)
 {
 	int error;
 	int attrnamespace;
@@ -160,8 +161,8 @@ hbsdcontrol_list_extattrs(const char *file, char ***features)
 	pos = 0;
 	fpos = 0;
 
-	if (features == NULL)
-		err(-1, "%s", "features");
+	if (attrs == NULL)
+		err(-1, "%s", "attrs");
 
 	error = extattr_string_to_namespace("system", &attrnamespace);
 	if (error)
@@ -182,8 +183,8 @@ hbsdcontrol_list_extattrs(const char *file, char ***features)
 		goto out;
 	}
 
-	*features = (char **)calloc(sizeof(char *), nitems(pax_features) * nitems(pax_features[0].entry));
-	if (*features == NULL) {
+	*attrs = (char **)calloc(sizeof(char *), nitems(pax_features) * nitems(pax_features[0].extattr));
+	if (*attrs == NULL) {
 		error = ENOMEM;
 		goto out;
 	}
@@ -200,26 +201,26 @@ hbsdcontrol_list_extattrs(const char *file, char ***features)
 		int j;
 		size_t attr_len;
 
-		assert(fpos < nitems(pax_features) * nitems(pax_features[0].entry));
+		assert(fpos < nitems(pax_features) * nitems(pax_features[0].extattr));
 
 		/* see EXTATTR(2) about the data structure */
 		len = data[pos++];
 
 		/* Yes, this isn't an optimized algorithm. */
 		for (i = 0; pax_features[i].feature != NULL; i++) {
-			/* The 2 comes from enum pax_feature_state's size */
+			/* The 2 comes from enum pax_attr_state's size */
 			for (j = 0; j < 2; j++) {
-				attr_len = strlen(pax_features[i].entry[j]);
+				attr_len = strlen(pax_features[i].extattr[j]);
 				if (attr_len != len) {
 					/* Fast path, skip if the size of attribute differs. */
 					continue;
 				}
 
-				if (!memcmp(pax_features[i].entry[j], &data[pos], attr_len)) {
+				if (!memcmp(pax_features[i].extattr[j], &data[pos], attr_len)) {
 					if (hbsdcontrol_verbose_flag) {
-						printf("\tfound attribute: %s\n", pax_features[i].entry[j]);
+						printf("\tfound attribute: %s\n", pax_features[i].extattr[j]);
 					}
-					(*features)[fpos] = strdup(pax_features[i].entry[j]);
+					(*attrs)[fpos] = strdup(pax_features[i].extattr[j]);
 					fpos++;
 				}
 			}
@@ -228,8 +229,8 @@ hbsdcontrol_list_extattrs(const char *file, char ***features)
 		pos += len;
 	}
 
-	/* NULL terminate the features array. */
-	(*features)[fpos] = NULL;
+	/* NULL terminate the attrs array. */
+	(*attrs)[fpos] = NULL;
 
 out:
 	free(data);
@@ -253,8 +254,8 @@ hbsdcontrol_set_feature_state(const char *file, const char *feature, enum pax_fe
 				    pax_features[i].feature, file);
 			}
 
-			error = hbsdcontrol_set_extattr(file, pax_features[i].entry[disable], !state);
-			error |= hbsdcontrol_set_extattr(file, pax_features[i].entry[enable], state);
+			error = hbsdcontrol_set_extattr(file, pax_features[i].extattr[disable], !state);
+			error |= hbsdcontrol_set_extattr(file, pax_features[i].extattr[enable], state);
 
 			break;
 		}
@@ -277,8 +278,8 @@ hbsdcontrol_rm_feature_state(const char *file, const char *feature)
 			if (hbsdcontrol_verbose_flag) 
 				printf("reset %s on %s\n",
 				    pax_features[i].feature, file);
-			error = hbsdcontrol_rm_extattr(file, pax_features[i].entry[disable]);
-			error |= hbsdcontrol_rm_extattr(file, pax_features[i].entry[enable]);
+			error = hbsdcontrol_rm_extattr(file, pax_features[i].extattr[disable]);
+			error |= hbsdcontrol_rm_extattr(file, pax_features[i].extattr[enable]);
 
 			break;
 		}
@@ -305,8 +306,8 @@ hbsdcontrol_list_features(const char *file, char **features)
 	for (i = 0; attrs[i] != NULL; i++) {
 		for (j = 0; pax_features[j].feature != NULL; j++) {
 			for (k = 0; k < 2; k++) {
-				if (!strcmp(pax_features[j].entry[k], attrs[i])) {
-					// features.append(strcmp(pax_features[i].entry[j]e);
+				if (!strcmp(pax_features[j].extattr[k], attrs[i])) {
+					// features.append(strcmp(pax_features[i].extattr[j]e);
 					printf("%s\n", attrs[i]);
 				}
 			}

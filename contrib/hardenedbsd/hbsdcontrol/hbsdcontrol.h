@@ -36,14 +36,14 @@ enum pax_feature_state {
 
 struct pax_feature_entry {
 	const char	*feature;
-	const char	*entry[2];
+	const char	*extattr[2];
 };
 
 extern const struct pax_feature_entry pax_features[];
 
-int hbsdcontrol_set_extattr(const char *file, const char *feature, const int val);
-int hbsdcontrol_rm_extattr(const char *file, const char *feature);
-int hbsdcontrol_list_extattrs(const char *file, char ***features);
+int hbsdcontrol_set_extattr(const char *file, const char *attr, const int val);
+int hbsdcontrol_rm_extattr(const char *file, const char *attr);
+int hbsdcontrol_list_extattrs(const char *file, char ***attrs);
 int hbsdcontrol_set_feature_state(const char *file, const char *feature, enum pax_feature_state state);
 int hbsdcontrol_rm_feature_state(const char *file, const char *feature);
 int hbsdcontrol_list_features(const char *file, char **features);
