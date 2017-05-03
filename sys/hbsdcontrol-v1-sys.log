@@ -1,13 +1,13 @@
-commit 47b61aaed2c14a520b09a38e031166ca27a676ab
+commit 49321a7f39f94197fb29627796a162c4c2761833
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Mon May 1 23:30:50 2017 +0200
 
-    HBSD: uptime the hbsdcontrol's kernel side function, and use proper nameing
+    HBSD: optimize the hbsdcontrol's kernel side function, and use proper nameing
     
     github-issue: #179
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit bde2f5adbdd3c0d051fcdf9cc2ef7c10bff0fe29
+commit b83e153fa7ce66d13f48e529307c4e9fb2c91c9f
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Mon May 1 23:04:39 2017 +0200
 
@@ -16,7 +16,7 @@ Date:   Mon May 1 23:04:39 2017 +0200
     github-issue: #179
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit f2ffaf5cbae0d3c17e9006df26d983918ff4e7da
+commit 263a376463884fe372669bd6714f3f3323f1a3e6
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Tue Jan 3 21:33:38 2017 +0100
 
@@ -24,7 +24,7 @@ Date:   Tue Jan 3 21:33:38 2017 +0100
     
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit c5f7fb78b229846e52fa58be0f4003fb2a09efad
+commit 3aba3b65ed8260e2ba2d3cdf211c2a4387387049
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Sun Jan 1 19:04:07 2017 +0100
 
@@ -32,7 +32,7 @@ Date:   Sun Jan 1 19:04:07 2017 +0100
     
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit 9af7cb8a5be81fe82f04d9853e512cd3a3d76b67
+commit 2969f3eb6781778057d9f0ff33f5c98ff3686e56
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Wed Dec 28 14:17:10 2016 +0100
 
@@ -48,7 +48,7 @@ Date:   Wed Dec 28 14:17:10 2016 +0100
     github-issue: #179
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit 7dc068fb0c31ad1d02678db2bcb4178d3fd0c839
+commit 4df22fb5dfe957c2c0176a1ce9f575b47dcbfb8a
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Tue Dec 27 01:05:09 2016 +0100
 
@@ -56,7 +56,7 @@ Date:   Tue Dec 27 01:05:09 2016 +0100
     
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit 598e71ccb4feab95f9bf7b75e15f051281c04cd2
+commit 49da176d58e10d20f0464225fc5480ef5285b218
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Tue Dec 27 00:55:31 2016 +0100
 
@@ -68,7 +68,7 @@ Date:   Tue Dec 27 00:55:31 2016 +0100
     
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit d3f37bdd5d7b962afc8b6a4ec570f1b7a6edaec6
+commit fb812719ba08f8d2f27a7199f755cd35fc92e99f
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Thu Nov 17 21:40:47 2016 +0100
 
@@ -78,7 +78,7 @@ Date:   Thu Nov 17 21:40:47 2016 +0100
     github-issue: #179
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit a2327c59d1f08495c1e5e7802f0f7de7e481c836
+commit e501e8f8643170b73c2ade93ad6bad26dd5ddcc2
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Sun Nov 6 20:08:26 2016 +0100
 
@@ -88,7 +88,7 @@ Date:   Sun Nov 6 20:08:26 2016 +0100
     github-issue: #179
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit ace79f20df68e853af4779eba6929ef0b6177c11
+commit 33a2671f65eb952fcc8fde77e045b05caf193c98
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Sun Nov 6 20:06:23 2016 +0100
 
@@ -98,7 +98,7 @@ Date:   Sun Nov 6 20:06:23 2016 +0100
     github-issue: #179
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit b96a35d6aa0948d8f408b10448f9bb39e26eb183
+commit 392901c5e8e558010eabb26cef8dbd61e5f121ba
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Sun Nov 6 20:03:21 2016 +0100
 
@@ -108,7 +108,7 @@ Date:   Sun Nov 6 20:03:21 2016 +0100
     github-issue: #179
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit c184775176829726aa4438b907fb86f3b87d1965
+commit 39b867dd64131b43a2e05b2e4330ce98f4727b8b
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Sun Nov 6 20:01:37 2016 +0100
 
@@ -122,7 +122,7 @@ Date:   Sun Nov 6 20:01:37 2016 +0100
     github-issue: #179
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit b811dcb440c381e3b98decd1b1f5aa550fd8b355
+commit ac4599da069177507d173b43978385f146e95c44
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Sun Nov 6 19:54:40 2016 +0100
 
@@ -142,7 +142,7 @@ Date:   Sun Nov 6 19:54:40 2016 +0100
     github-issue: #179
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit 77f477daae6ed96f4d12006113ac136cd2e54525
+commit d87eff686ed2296e6404c5b2e069af5c0ca38b33
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Sun Nov 6 19:19:18 2016 +0100
 
@@ -155,7 +155,17 @@ Date:   Sun Nov 6 19:19:18 2016 +0100
     github-issue: #179
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit 92f13c0dfad590d1e33a1a6cb063ccf00584b8e6
+commit 744b18bd0c9bf35ac2cfe870720aea6b9eea5490
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Sun Nov 6 18:56:03 2016 +0100
+
+    HBSD: follow namespace change in user-land part too
+    
+    github-issue: #30
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit ad2ee5eeb4dc33d3bbe37bed6a00f937d93040fa
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Sun Nov 6 18:53:21 2016 +0100
 
@@ -165,7 +175,7 @@ Date:   Sun Nov 6 18:53:21 2016 +0100
     github-issue: #179
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit f53f9d6186800aa82444b1848af3f671c05111fc
+commit c236d7fef91775f0048ae7dbe66050bc68d79fb5
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Sun Nov 6 18:52:24 2016 +0100
 
@@ -178,7 +188,7 @@ Date:   Sun Nov 6 18:52:24 2016 +0100
     github-issue: #179
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit 2969631f246bbdbad781f5d66021235654714fa7
+commit 5e8bc5d3f5c574d47f87b661da5ee7f0a1afea73
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Sun Nov 6 18:49:49 2016 +0100
 
@@ -188,7 +198,7 @@ Date:   Sun Nov 6 18:49:49 2016 +0100
     github-issue: #179
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit 7a18030b5686d1b40e1aa21fe7e5f274cb18ce94
+commit fd87fabe4a7c65865dc6b392b62901a0dd4f0c54
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Sat Jan 23 23:27:41 2016 +0100
 
@@ -197,7 +207,7 @@ Date:   Sat Jan 23 23:27:41 2016 +0100
     MFC-to: 10-STABLE
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit c7231b84686e7d621092e96ef27d6fbac5754e45
+commit 5cf8083f2c0d4820703057d9699815010391a6f1
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Tue Jan 19 22:55:18 2016 +0100
 
@@ -207,7 +217,7 @@ Date:   Tue Jan 19 22:55:18 2016 +0100
     github-issue: #179
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit 2c2e910429d5df18526f4d901d839472ba9b7cb7
+commit ba889d4811dcff3b7313f75bcd91be3a2920277c
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Sun Jan 17 20:20:23 2016 +0100
 
@@ -217,7 +227,7 @@ Date:   Sun Jan 17 20:20:23 2016 +0100
     github-issue: #179
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit a755f63294d54639d08abfe537cc50fddcb2969b
+commit 14a33b17c84d5b121e85a628a5c367f0ca1dd7c3
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Thu Jan 14 23:34:26 2016 +0100
 
@@ -229,7 +239,17 @@ Date:   Thu Jan 14 23:34:26 2016 +0100
     github-issue: #179
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit 1553167bc4ade7110a203f46a20a1596da52f800
+commit 14e2abd630c66a2881e4fabbfbc53ccbd5a4d6ef
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Sat Jan 9 18:28:33 2016 +0100
+
+    HBSD: properly set feature statuses with hbsdcontrol
+    
+    github-isue: #30
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit 722e6cab6c790b3633d5369f16cb9d119b3e2e2e
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Sat Jan 9 15:18:33 2016 +0100
 
@@ -243,7 +263,7 @@ Date:   Sat Jan 9 15:18:33 2016 +0100
     github-issue: #179
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit d1f5b4523a7f1854d56a9f4f9a9dfa293711a38d
+commit b6d4d5add61d45d0b527184b60f00574f51437b3
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Sat Dec 5 22:37:24 2015 +0100
 
@@ -253,7 +273,57 @@ Date:   Sat Dec 5 22:37:24 2015 +0100
     github-issue: #179
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit 7c815301b691313d5dd47f0cf0ec46548e007507
+commit 78714074b2ae797b2236d88ddc94562caa3824c5
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Sat Dec 5 21:39:07 2015 +0100
+
+    HBSD: add hbsdcontrol PoC to /sbin
+    
+    boot: change/set/get settings in /boot/loader.conf - not yet implemented
+    global: change/set/get sysctl settings runtime implemented, /etc/sysctl.conf not yet implemented
+    system: change/set/get attribute in file's FS extended attribute system namespace
+    user: change/set/get attribute in file's FS extended attribute user namespace,
+     not this require write permisson to file
+    
+    some example run:
+    
+    op@opn hbsdcontrol> ./hbsdcontrol.sh boot
+    not implemented - missing hbsdcontrol.sh support
+    op@opn hbsdcontrol> ./hbsdcontrol.sh global
+    ./hbsdcontrol.sh: <class> <feature> <state>
+            <class> := (boot|global|system|user)
+            <feature> := (aslr|pageexec|mprotect|segvguard|disallow_map32bit)
+    
+    op@opn hbsdcontrol> ./hbsdcontrol.sh system
+    ./hbsdcontrol.sh: <class> <feature> <state> file
+            <class> := (boot|global|system|user)
+            <feature> := (aslr|pageexec|mprotect|segvguard|disallow_map32bit|shlibrandom)
+    
+    op@opn hbsdcontrol> ./hbsdcontrol.sh user
+    not implemented - missing kernel support
+    ./hbsdcontrol.sh: <class> <feature> <state> file
+            <class> := (boot|global|system|user)
+            <feature> := (aslr|pageexec|mprotect|segvguard|disallow_map32bit|shlibrandom)
+    
+    op@opn hbsdcontrol> ./hbsdcontrol.sh global aslr status
+    hardening.pax.aslr.status: 2
+    
+    op@opn hbsdcontrol> ./hbsdcontrol.sh user aslr status /tmp/ls
+    not implemented - missing kernel support
+    getextattr: /tmp/ls: failed: Attribute not found
+    
+    op@opn hbsdcontrol> ./hbsdcontrol.sh user aslr enable /tmp/ls
+    not implemented - missing kernel support
+    
+    op@opn hbsdcontrol> ./hbsdcontrol.sh user aslr status /tmp/ls
+    not implemented - missing kernel support
+    /tmp/ls 1
+    
+    github-issue: #30
+    github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit 5ddeeaa762c5680e0f901c9376bff6ba15467130
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Sat Dec 5 02:32:06 2015 +0100
 
@@ -267,7 +337,7 @@ Date:   Sat Dec 5 02:32:06 2015 +0100
     github-issue: #179
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 
-commit 8c26f2cf9b5829c3598b6a8e152f33ce762736f3
+commit 6d3ca35a2036b09eccde14e38ea149143bbe5c8c
 Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
 Date:   Sat Dec 5 01:51:17 2015 +0100
 
@@ -275,4 +345,12 @@ Date:   Sat Dec 5 01:51:17 2015 +0100
     
     github-issue: #30
     github-issue: #179
+    Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+
+commit bbf5c24db47828286b4ca19c2552992a73ee76e8
+Author: Oliver Pinter <oliver.pinter@hardenedbsd.org>
+Date:   Sat Dec 5 19:46:00 2015 +0100
+
+    HBSD XXX: added dev tools under tools/hardenedbsd
+    
     Signed-off-by: Oliver Pinter <oliver.pinter@hardenedbsd.org>

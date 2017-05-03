@@ -1,3 +1,320 @@
+diff --git a/sbin/Makefile b/sbin/Makefile
+index 51e80bae8001..b08af5e79491 100644
+--- a/sbin/Makefile
++++ b/sbin/Makefile
+@@ -30,6 +30,7 @@ SUBDIR=adjkerntz \
+ 	ggate \
+ 	growfs \
+ 	gvinum \
++	hbsdcontrol \
+ 	ifconfig \
+ 	init \
+ 	kldconfig \
+diff --git a/sbin/hbsdcontrol/Makefile b/sbin/hbsdcontrol/Makefile
+new file mode 100644
+index 000000000000..0495f2de1e93
+--- /dev/null
++++ b/sbin/hbsdcontrol/Makefile
+@@ -0,0 +1,9 @@
++# $FreeBSD$
++
++.include <src.opts.mk>
++
++SCRIPTS= hbsdcontrol.sh
++
++NOMAN=
++
++.include <bsd.prog.mk>
+diff --git a/sbin/hbsdcontrol/hbsdcontrol.sh b/sbin/hbsdcontrol/hbsdcontrol.sh
+new file mode 100755
+index 000000000000..78694f0fbec6
+--- /dev/null
++++ b/sbin/hbsdcontrol/hbsdcontrol.sh
+@@ -0,0 +1,284 @@
++#!/bin/sh
++
++#
++# hbsdcontrol PoC in shell
++#
++# this program should be rewritten in C in the future
++#
++
++LSEXTATTR="/usr/sbin/lsextattr"
++RMEXTATTR="/usr/sbin/rmextattr"
++GETEXTATTR="/usr/sbin/getextattr"
++SETEXTATTR="/usr/sbin/setextattr"
++SYSCTL="/sbin/sysctl"
++
++err()
++{
++	echo $*
++	exit 1
++}
++
++usage()
++{
++	echo "$0: <class> <feature> <state> file"
++	echo "	<class> := (boot|global|system|user)"
++}
++
++usage_wo_file()
++{
++	echo "$0: <class> <feature> <state>"
++	echo "	<class> := (boot|global|system|user)"
++}
++
++usage_boot_system()
++{
++	err "not implemented - missing hbsdcontrol.sh support"
++}
++
++
++usage_class_global()
++{
++	usage_wo_file
++	echo "	<feature> := (aslr|pageexec|mprotect|segvguard|disallow_map32bit)"
++}
++
++usage_class_fsea()
++{
++	usage
++	echo "	<feature> := (aslr|pageexec|mprotect|segvguard|disallow_map32bit|shlibrandom)"
++}
++
++usage_state()
++{
++	echo "	<state> := (disable|opt-in|opt-out|enable|status)"
++}
++
++usage_state_simple()
++{
++	echo "	<state> := (disable|enable|status)"
++}
++
++usage_class_global_state()
++{
++	usage_class_global
++	usage_state
++}
++
++usage_class_fsea_state()
++{
++	usage_class_fsea
++	usage_state_simple
++}
++
++
++################################################################
++
++class_boot()
++{
++	feature=$1
++	shift
++	case ${feature} in
++		*)
++			usage_boot_system $*
++			;;
++	esac
++}
++
++class_global_state_sysctl()
++{
++	feature=$1
++	shift
++	state=$1
++	shift
++
++	if [ ${state} = -1 ]
++	then
++		${SYSCTL} hardening.pax.${feature}.status
++	else
++		${SYSCTL} hardening.pax.${feature}.status=${state}
++	fi	
++}
++
++class_global_state()
++{
++	feature=$1
++	state=$2
++	
++	case ${state} in
++		disable)
++			state=0
++			;;
++		opt-in)
++			state=1
++			;;
++		opt-out)
++			state=2
++			;;
++		enable)
++			state=3
++			;;
++		status)
++			state=-1
++			;;
++		*)
++			usage_class_global_state
++			exit 1
++			;;
++	esac
++
++	class_global_state_sysctl ${feature} ${state}
++}
++
++class_global()
++{
++	feature=$1
++	shift
++
++	case ${feature} in
++		aslr)
++			;&
++		pageexec)
++			;&
++		mprotect)
++			;&
++		segvguard)
++			;&
++		disallow_map32bit)
++			class_global_state ${feature} $*
++			;;
++		*)
++			usage_class_global
++			exit 1
++			;;
++	esac
++}
++
++class_system_state_extattr()
++{
++	namespace=$1
++	shift
++	feature=$1
++	shift
++	state=$1
++	shift
++	file="${1}"
++	shift
++
++	if [ -z ${file} ]
++	then
++		usage_class_fsea_state ${namespace}
++		exit 1
++	fi
++		
++	if [ ! -f ${file} ]
++	then
++		usage_class_fsea_state ${namespace}
++		err "${file} not exists!"
++	fi
++
++	if [ ${state} = -1 ]
++	then
++		${GETEXTATTR} ${namespace} hbsd.pax.${feature} ${file}
++	else
++		${RMEXTATTR} ${namespace} hbsd.pax.${feature} ${file} > /dev/null 2>&1
++		${RMEXTATTR} ${namespace} hbsd.pax.no${feature} ${file} > /dev/null 2>&1
++		case ${state} in
++			0)
++				${SETEXTATTR} ${namespace} hbsd.pax.no${feature} 1 ${file}
++				${SETEXTATTR} ${namespace} hbsd.pax.${feature} 0 ${file}
++				;;
++			1)
++				${SETEXTATTR} ${namespace} hbsd.pax.${feature} 1 ${file}
++				${SETEXTATTR} ${namespace} hbsd.pax.no${feature} 0 ${file}
++				;;
++		esac
++	fi	
++}
++
++class_fsea_state()
++{
++	namespace=$1
++	shift
++	feature=$1
++	shift
++	state=$1
++	shift
++	
++	case ${state} in
++		disable)
++			state=0
++			;;
++		enable)
++			state=1
++			;;
++		status)
++			state=-1
++			;;
++		*)
++			usage_class_fsea_state ${namespace}
++			exit 1
++			;;
++	esac
++
++	class_system_state_extattr ${namespace} ${feature} ${state} $*
++}
++
++class_fsea()
++{
++	namespace=$1
++	shift
++	feature=$1
++	shift
++	case ${feature} in
++		aslr)
++			;&
++		pageexec)
++			;&
++		mprotect)
++			;&
++		segvguard)
++			;&
++		disallow_map32bit)
++			;&
++		shlibrandom)
++			class_fsea_state ${namespace} ${feature} $*
++			;;
++		*)
++			usage_class_fsea ${namespace}
++			exit 1
++			;;
++	esac
++}
++
++class_system()
++{
++	class_fsea system $*
++}
++
++class_user()
++{
++	class_fsea user $*
++}
++
++class="$1"
++shift
++case ${class} in
++	boot)
++		class_boot $*
++		;;
++	global)
++		class_global $*
++		;;
++	system)
++		class_system $*
++		;;
++	user)
++		echo "not implemented - missing kernel support"
++		class_user $*
++		;;
++	*)
++		usage
++		exit 1
++		;;
++esac
++
 diff --git a/sys/amd64/conf/HARDENEDBSD b/sys/amd64/conf/HARDENEDBSD
 index c9d7717eeee8..68218810c9bd 100644
 --- a/sys/amd64/conf/HARDENEDBSD
@@ -39,10 +356,10 @@ index d7ae0d9d4eeb..4c0e19c39e0f 100644
  options 	PAX_HARDENING	# Other hardening features
  options 	PAX_NOEXEC	# Remove WX pages from user-space and enforce W^X
 diff --git a/sys/conf/files b/sys/conf/files
-index 2ffd63fbbbb6..e61e7285abe6 100644
+index 774b2fc4a1c2..e188187cbd7f 100644
 --- a/sys/conf/files
 +++ b/sys/conf/files
-@@ -3533,6 +3533,7 @@ hardenedbsd/hbsd_pax_aslr.c		optional pax pax_aslr
+@@ -3535,6 +3535,7 @@ hardenedbsd/hbsd_pax_aslr.c		optional pax pax_aslr
  hardenedbsd/hbsd_pax_hardening.c	optional pax pax_hardening
  hardenedbsd/hbsd_pax_noexec.c		optional pax pax_noexec
  hardenedbsd/hbsd_pax_segvguard.c	optional pax pax_segvguard
@@ -50,7 +367,7 @@ index 2ffd63fbbbb6..e61e7285abe6 100644
  #
  isa/isa_if.m			standard
  isa/isa_common.c		optional isa
-@@ -4597,7 +4598,7 @@ security/mac/mac_cred.c		optional mac
+@@ -4599,7 +4600,7 @@ security/mac/mac_cred.c		optional mac
  security/mac/mac_framework.c	optional mac
  security/mac/mac_inet.c		optional mac inet | mac inet6
  security/mac/mac_inet6.c	optional mac inet6
@@ -75,7 +392,7 @@ index 34702652cf5d..2cba4532c69b 100644
  # ASLR overwritable defaults
 diff --git a/sys/hardenedbsd/hbsd_hbsdcontrol.c b/sys/hardenedbsd/hbsd_hbsdcontrol.c
 new file mode 100644
-index 000000000000..b151c17993a4
+index 000000000000..a83c85276965
 --- /dev/null
 +++ b/sys/hardenedbsd/hbsd_hbsdcontrol.c
 @@ -0,0 +1,291 @@
@@ -195,7 +512,7 @@ index 000000000000..b151c17993a4
 +	feature_status = 0;
 +	fsea_list = NULL;
 +	fsea_list_size = 0;
-+	fsea_attrname_size = 0;
++	fsea_attrname_len = 0;
 +	parsed_flags = 0;
 +
 +	for (i = 0; i < nitems(feature_present); i++)
@@ -254,7 +571,7 @@ index 000000000000..b151c17993a4
 +			 * with the attribute name stored without zero.
 +			 */
 +			if (fsea_attrname_len != entry_size)
-+				break;
++				continue;
 +
 +			/*
 +			 * Compare the strings as byte arrays without the ending zeros
@@ -492,3 +809,139 @@ index 531175593f4f..0746519d1a0a 100644
   * ASLR related functions
   */
  bool pax_aslr_active(struct proc *p);
+diff --git a/tools/hardenedbsd/build_hbsd_kernel_64bit.csh b/tools/hardenedbsd/build_hbsd_kernel_64bit.csh
+new file mode 100755
+index 000000000000..6d41ed69aa4c
+--- /dev/null
++++ b/tools/hardenedbsd/build_hbsd_kernel_64bit.csh
+@@ -0,0 +1,31 @@
++#!/bin/csh
++
++setenv TARGET amd64
++setenv MAKEOBJDIRPREFIX /tmp/${TARGET}-objdir
++setenv __MAKE_CONF /dev/null
++setenv DESTDIR /tmp/${TARGET}-kernel
++@ __freebsd_mk_jobs = `sysctl -n kern.smp.cpus` + 1
++set current_dir = `pwd`
++set _current_dir = `echo ${current_dir} | sed -e 's|\(.*/\)\(.*\.git\)\(/.*\)*|\2|g'`
++set _current_realdir = `echo ${current_dir} | sed -e 's|\(.*/\)\(.*\.git\)\(/.*\)*|\1/\2|g'`
++set _check_toolchain = "${MAKEOBJDIRPREFIX}/___kernel-toolchain_DONE"
++set _date=`date "+%Y%m%d%H%M%S"`
++set _log="/tmp/${TARGET}-cc-log-${_current_dir}-${_date}"
++set _log_last="/tmp/${TARGET}-cc-log-${_current_dir}.last"
++
++if ( (${_current_dir} != "hardenedBSD.git")) then
++	if ((${_current_dir} != "opBSD.git")) then
++		set _current_dir = "hardenedBSD.git"
++	endif
++endif
++
++echo "build source dir: ${_current_dir}"
++sleep 1
++
++if ( ! -d $MAKEOBJDIRPREFIX ) then
++	mkdir $MAKEOBJDIRPREFIX
++endif
++
++ln -sf ${_log} ${_log_last}
++
++(cd /usr/data/source/git/opBSD/${_current_dir}; make -j$__freebsd_mk_jobs -DNO_ROOT KERNCONF=HARDENEDBSD kernel) |& tee -a ${_log}
+diff --git a/tools/hardenedbsd/build_hbsd_kernel_64bit_nc.csh b/tools/hardenedbsd/build_hbsd_kernel_64bit_nc.csh
+new file mode 100755
+index 000000000000..5cdde44494b8
+--- /dev/null
++++ b/tools/hardenedbsd/build_hbsd_kernel_64bit_nc.csh
+@@ -0,0 +1,31 @@
++#!/bin/csh
++
++setenv TARGET amd64
++setenv MAKEOBJDIRPREFIX /tmp/${TARGET}-objdir
++setenv __MAKE_CONF /dev/null
++setenv DESTDIR /tmp/${TARGET}-kernel
++@ __freebsd_mk_jobs = `sysctl -n kern.smp.cpus` + 1
++set current_dir = `pwd`
++set _current_dir = `echo ${current_dir} | sed -e 's|\(.*/\)\(.*\.git\)\(/.*\)*|\2|g'`
++set _current_realdir = `echo ${current_dir} | sed -e 's|\(.*/\)\(.*\.git\)\(/.*\)*|\1/\2|g'`
++set _check_toolchain = "${MAKEOBJDIRPREFIX}/___kernel-toolchain_DONE"
++set _date=`date "+%Y%m%d%H%M%S"`
++set _log="/tmp/${TARGET}-cc-log-${_current_dir}-${_date}"
++set _log_last="/tmp/${TARGET}-cc-log-${_current_dir}.last"
++
++if ( (${_current_dir} != "hardenedBSD.git")) then
++	if ((${_current_dir} != "opBSD.git")) then
++		set _current_dir = "hardenedBSD.git"
++	endif
++endif
++
++echo "build source dir: ${_current_dir}"
++sleep 1
++
++if ( ! -d $MAKEOBJDIRPREFIX ) then
++	mkdir $MAKEOBJDIRPREFIX
++endif
++
++ln -sf ${_log} ${_log_last}
++
++(cd /usr/data/source/git/opBSD/${_current_dir}; make -j$__freebsd_mk_jobs -DNO_ROOT -DNO_CLEAN KERNCONF=HARDENEDBSD kernel) |& tee -a ${_log}
+diff --git a/tools/hardenedbsd/run_test_kernel.csh b/tools/hardenedbsd/run_test_kernel.csh
+new file mode 100755
+index 000000000000..1cc567367f1f
+--- /dev/null
++++ b/tools/hardenedbsd/run_test_kernel.csh
+@@ -0,0 +1,12 @@
++#!/bin/csh
++
++set VM_RUN="/tmp/vmrun-hbsd.sh"
++
++kldload -n vmm
++
++if ( ! -e ${VM_RUN} ) then
++	cp /usr/share/examples/bhyve/vmrun.sh ${VM_RUN}
++	chmod +x ${VM_RUN}
++endif
++
++${VM_RUN} -d /tmp/hbsd.raw test
+diff --git a/tools/hardenedbsd/update_test_kernel.csh b/tools/hardenedbsd/update_test_kernel.csh
+new file mode 100755
+index 000000000000..803db736becf
+--- /dev/null
++++ b/tools/hardenedbsd/update_test_kernel.csh
+@@ -0,0 +1,38 @@
++#!/bin/csh
++
++#
++# A very dirty test-env update script...
++#
++
++set DISK="/tmp/hbsd.raw"
++set INSTALLER_URL="http://installer.hardenedbsd.org/releases/hardened_current_master-LAST/HardenedBSD-11-CURRENT-v34-amd64-disc1.iso"
++set INSTALLER="/tmp/installer.iso"
++
++umount /mnt
++mdconfig -d -u 0
++
++kldload -n vmm
++
++if ( ! -f ${DISK} ) then
++
++	if ( ! -f ${INSTALLER} ) then
++		fetch ${INSTALLER_URL} -o ${INSTALLER}
++	endif
++	
++	truncate -s 3G ${DISK}
++	~/vmrun.sh -I ${INSTALLER} -d ${DISK} -m 1G install
++endif
++
++mdconfig -a -t vnode -f ${DISK}
++
++#fsck_ufs /dev/md0p2
++
++mount /dev/md0p2 /mnt
++
++rm -r /mnt/boot/kernel /mnt/usr/lib/debug/boot/kernel
++
++cp -rv /tmp/amd64-kernel/ /mnt
++
++umount /mnt
++
++mdconfig -d -u 0
