@@ -29,7 +29,7 @@
 #ifndef __HBSDCONTROL_H
 #define	__HBSDCONTROL_H
 
-enum pax_feature_state {
+enum feature_state {
 	disable = 0,
 	enable = 1
 };
@@ -45,8 +45,8 @@ int hbsdcontrol_set_extattr(const char *file, const char *attr, const int val);
 int hbsdcontrol_get_extattr(const char *file, const char *attr, int *val);
 int hbsdcontrol_rm_extattr(const char *file, const char *attr);
 int hbsdcontrol_list_extattrs(const char *file, char ***attrs);
-int hbsdcontrol_set_feature_state(const char *file, const char *feature, enum pax_feature_state state);
-int hbsdcontrol_get_feature_state(const char *file, const char *feature, enum pax_feature_state *state);
+int hbsdcontrol_set_feature_state(const char *file, const char *feature, enum feature_state state);
+int hbsdcontrol_get_feature_state(const char *file, const char *feature, enum feature_state *state);
 int hbsdcontrol_rm_feature_state(const char *file, const char *feature);
 int hbsdcontrol_list_features(const char *file, char **features);
 

@@ -286,7 +286,7 @@ out:
 }
 
 int
-hbsdcontrol_set_feature_state(const char *file, const char *feature, enum pax_feature_state state)
+hbsdcontrol_set_feature_state(const char *file, const char *feature, enum feature_state state)
 {
 	int i;
 	int error;
