@@ -39,6 +39,15 @@ struct pax_feature_entry {
 	const char	*extattr[2];
 };
 
+struct pax_feature_state {
+	char	*feature;
+	struct {
+		char	*extattr;
+		enum feature_state	 state;
+	} internal[2];
+	int	state;
+};
+
 extern const struct pax_feature_entry pax_features[];
 
 int hbsdcontrol_set_extattr(const char *file, const char *attr, const int val);

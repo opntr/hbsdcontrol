@@ -44,6 +44,9 @@
 
 #include "hbsdcontrol.h"
 
+
+static int hbsdcontrol_validate_state(struct pax_feature_state *feature_state);
+
 static int hbsdcontrol_verbose_flag;
 
 const struct pax_feature_entry pax_features[] = {
@@ -335,32 +338,56 @@ hbsdcontrol_rm_feature_state(const char *file, const char *feature)
 	return (error);
 }
 
+
 int
-hbsdcontrol_list_features(const char *file, char **features)
+hbsdcontrol_get_all_feature_state(const char *file, struct pax_feature_state **feature_states)
 {
-	int i, j, k;
+	int i, j, k, l;
 	int error;
 	char **attrs;
-	char *attr; // XXXOP
+	int val;
+	bool found = false;
 
 	error = 0;
 	attrs = NULL;
+	l = 0;
+
+	assert(feature_states != NULL);
+
+	*feature_states = calloc(sizeof(struct pax_feature_state), nitems(pax_features));
+
+	assert(*feature_states != NULL);
 
 	hbsdcontrol_list_extattrs(file, &attrs);
 	if (attrs == NULL)
 		err(-1, "attrs == NULL");
 
-	for (i = 0; attrs[i] != NULL; i++) {
-		for (j = 0; pax_features[j].feature != NULL; j++) {
+	/*
+	 * Ezt itt kellene optimalizalni, hogy az atts legyen kivul,
+	 * viszont csak akkor kellene novelni az l-t ha ..
+	 */
+	for (j = 0; pax_features[j].feature != NULL; j++) {
+		for (i = 0; attrs[i] != NULL; i++) {
 			for (k = 0; k < 2; k++) {
 				if (!strcmp(pax_features[j].extattr[k], attrs[i])) {
-					int val;
-					// features.append(strcmp(pax_features[i].extattr[j]e);
+
 					hbsdcontrol_get_extattr(file, attrs[i], &val);
-					printf("%s (%s: %d)\n", pax_features[j].feature, attrs[i], val);
+					if (hbsdcontrol_verbose_flag)
+						printf("%s (%s: %d)\n", pax_features[j].feature, attrs[i], val);
+
+					assert(l < nitems(pax_features));
+
+					if ((*feature_states)[l].feature == NULL)
+						(*feature_states)[l].feature = strdup(pax_features[j].feature);
+					(*feature_states)[l].internal[k].state = val;	
+					(*feature_states)[l].internal[k].extattr = strdup(pax_features[j].extattr[k]);
+					(*feature_states)[l].state = hbsdcontrol_validate_state(&(*feature_states)[l]);
+					found = true;
 				}
 			}
 		}
+		l = found ? l+1 : l;
+		found = false;
 	}
 
 	for (i = 0; attrs[i] != NULL; i++) {
@@ -371,6 +398,78 @@ hbsdcontrol_list_features(const char *file, char **features)
 	attrs = NULL;
 
 	return (error);
+}
+
+
+int
+hbsdcontrol_list_features(const char *file, char **features)
+{
+	struct pax_feature_state	*feature_states;
+	int i, j;
+
+	hbsdcontrol_get_all_feature_state(file, &feature_states);
+
+	for (i = 0; i < nitems(pax_features); i++) {
+		if (feature_states[i].feature == NULL)
+			continue;
+
+		printf("%s\t", feature_states[i].feature);
+		for (j = 0; j < 2; j++) {
+			printf("%s: %d\t", feature_states[i].internal[j].extattr,
+			    feature_states[i].internal[j].state);
+		}
+		printf("->\t%d\n", feature_states[i].state);
+	}
+
+	// factor this out to pax_feature_states_free(struct pax_feature_states **ctx)
+	for (i = 0; i < nitems(pax_features); i++) {
+		free(feature_states[i].feature);
+		feature_states[i].feature = NULL;
+		for (j = 0; j < 2; j++) {
+			free(feature_states[i].internal[j].extattr);
+			feature_states[i].internal[j].extattr = NULL;
+		}
+	}
+
+	return (0);
+}
+
+static int
+hbsdcontrol_validate_state(struct pax_feature_state *feature_state)
+{
+	int state = 3;
+	int nf, f;
+
+	static int	state_map[4][3] = {
+				// nf	    f
+		{0, 0, 0},	// false, false -> disable / conflict*
+		{0, 1, 0},	// false, true  -> enable
+		{1, 0, 0},	// true,  false -> disable
+		{1, 1, 2},	// true,  true  -> conflict
+		
+		/* *
+		 * disable if one of them missing
+		 * and conflict when both present
+		 */
+	};
+
+	assert(feature_state != NULL);
+
+	nf = feature_state->internal[disable].state;
+	f = feature_state->internal[enable].state;
+
+	if (nf == 0 && f == 0)
+		state = 2;
+	else if (nf == 0 && f == 1)
+		state = 1;
+	else if (nf == 1 && f == 0)
+		state = 0;
+	else if (nf == 1 && f == 1)
+		state = 2;
+	else
+		assert(false);
+
+	return (state);
 }
 
 int
