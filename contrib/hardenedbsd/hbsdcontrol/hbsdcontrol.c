@@ -354,8 +354,10 @@ hbsdcontrol_list_features(const char *file, char **features)
 		for (j = 0; pax_features[j].feature != NULL; j++) {
 			for (k = 0; k < 2; k++) {
 				if (!strcmp(pax_features[j].extattr[k], attrs[i])) {
+					int val;
 					// features.append(strcmp(pax_features[i].extattr[j]e);
-					printf("%s\n", attrs[i]);
+					hbsdcontrol_get_extattr(file, attrs[i], &val);
+					printf("%s (%s: %d)\n", pax_features[j].feature, attrs[i], val);
 				}
 			}
 		}

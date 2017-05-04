@@ -3,3 +3,4 @@
 * rewrite the main program
 * capsicumize the main program
 * create a proper documentation
+* check for file and parent directory permissions before applying rules
