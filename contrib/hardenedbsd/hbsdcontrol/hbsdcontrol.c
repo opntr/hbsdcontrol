@@ -284,6 +284,10 @@ hbsdcontrol_list_extattrs(const char *file, char ***attrs)
 
 out:
 	free(data);
+	if (error) {
+		free(*attrs);
+		*attrs = NULL;
+	}
 
 	return (error);
 }
