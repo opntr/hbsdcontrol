@@ -362,7 +362,7 @@ hbsdcontrol_get_all_feature_state(const char *file, struct pax_feature_state **f
 
 	assert(*feature_states != NULL);
 
-	hbsdcontrol_list_extattrs(file, &attrs);
+	error = hbsdcontrol_list_extattrs(file, &attrs);
 	if (attrs == NULL)
 		err(-1, "attrs == NULL");
 

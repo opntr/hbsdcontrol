@@ -34,6 +34,7 @@
 #include <sys/sbuf.h>
 #include <sys/uio.h>
 #include <sys/extattr.h>
+#include <sys/stat.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -85,12 +86,16 @@ enable_disable(int argc, char **argv, int state)
 {
 	char *feature;
 	char *file;
+	struct stat st;
 
 	if (argc < 3)
 		err(-1, "bar");
 
 	feature = argv[1];
 	file = argv[2];
+
+	if (lstat(file, &st))
+		perror("file!");
 
 	hbsdcontrol_set_feature_state(file, feature, state);
 
@@ -103,11 +108,16 @@ list(int argc, char **argv)
 	char *feature;
 	char *file;
 	char *dummy;
+	struct stat st;
 
 	if (argc < 2)
 		err(-1, "bar");
 
 	file = argv[1];
+
+	if (lstat(file, &st))
+		errx(-1, "file!");
+
 
 	hbsdcontrol_list_features(file, &dummy);
 
@@ -141,6 +151,8 @@ rm_fsea(int argc, char **argv)
 
 	feature = argv[1];
 	file = argv[2];
+
+
 
 	return (hbsdcontrol_rm_feature_state(file, feature));
 }
