@@ -31,7 +31,9 @@
 
 enum feature_state {
 	disable = 0,
-	enable = 1
+	enable = 1,
+
+	conflict = 666
 };
 
 struct pax_feature_entry {

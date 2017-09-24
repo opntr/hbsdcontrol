@@ -145,7 +145,7 @@ hbsdcontrol_get_extattr(const char *file, const char *attr, int *val)
 		err(-1, "%s", "system");
 
 	len = extattr_get_file(file, attrnamespace, attr, NULL, 0);
-	if (len == -1) {
+	if (len < 0) {
 		perror(__func__);
 		errx(-1, "abort");
 	}
@@ -441,35 +441,22 @@ hbsdcontrol_list_features(const char *file, char **features)
 static int
 hbsdcontrol_validate_state(struct pax_feature_state *feature_state)
 {
-	int state = 3;
-	int nf, f;
-
-	static int	state_map[4][3] = {
-				// nf	    f
-		{0, 0, 0},	// false, false -> disable / conflict*
-		{0, 1, 0},	// false, true  -> enable
-		{1, 0, 0},	// true,  false -> disable
-		{1, 1, 2},	// true,  true  -> conflict
-		
-		/* *
-		 * disable if one of them missing
-		 * and conflict when both present
-		 */
-	};
+	int state = -1;
+	enum feature_state negated_feature, feature;
 
 	assert(feature_state != NULL);
 
-	nf = feature_state->internal[disable].state;
-	f = feature_state->internal[enable].state;
+	negated_feature = feature_state->internal[disable].state;
+	feature = feature_state->internal[enable].state;
 
-	if (nf == 0 && f == 0)
-		state = 2;
-	else if (nf == 0 && f == 1)
-		state = 1;
-	else if (nf == 1 && f == 0)
-		state = 0;
-	else if (nf == 1 && f == 1)
-		state = 2;
+	if (negated_feature == disable && feature == disable)
+		state = conflict;
+	else if (negated_feature == disable && feature == enable)
+		state = enable;
+	else if (negated_feature == enable && feature == disable)
+		state = disable;
+	else if (negated_feature == enable && feature == enable)
+		state = conflict;
 	else
 		assert(false);
 
