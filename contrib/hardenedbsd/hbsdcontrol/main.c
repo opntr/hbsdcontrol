@@ -51,51 +51,76 @@
 bool flag_force = false;
 int flag_verbose = 0;
 bool flag_immutable = false;
+bool flag_keepgoing = false;
 
-static int dummy_cb(int argc, char **argv);
-static int enable_cb(int argc, char **argv);
-static int disable_cb(int argc, char **argv);
-static int reset_cb(int argc, char **argv);
-static int list_cb(int argc, char **argv);
+static void usage(void);
+
+static int pax_cb(int *argc, char ***argv);
+static void pax_usage(bool terminate);
+static int pax_enable_cb(int *argc, char ***argv);
+static int pax_disable_cb(int *argc, char ***argv);
+static int pax_reset_cb(int *argc, char ***argv);
+static int pax_list_cb(int *argc, char ***argv);
+
+static int dummy_cb(int *argc, char ***argv);
+
+
+struct hbsdcontrol_action_entry {
+	const char	*action;
+	const int	 min_argc;
+	int		(*fn)(int *, char ***);
+};
 
 struct hbsdcontrol_command_entry {
 	const char	*cmd;
 	const int	 min_argc;
-	int		(*fn)(int, char **);
+	int		(*fn)(int *, char ***);
+	void		(*usage)(bool);
 };
 
 const struct hbsdcontrol_command_entry hbsdcontrol_commands[] = {
-	{"enable",	3,	enable_cb},
-	{"disable",	3,	disable_cb},
+	{"pax",		3,	pax_cb,	pax_usage},
+	{NULL,		0,	NULL,	NULL},
+};
+
+const struct hbsdcontrol_action_entry hbsdcontrol_pax_actions[] = {
+	{"enable",	3,	pax_enable_cb},
+	{"disable",	3,	pax_disable_cb},
 	{"status",	3,	dummy_cb},
-	{"reset",	3,	reset_cb},
+	{"reset",	3,	pax_reset_cb},
 	{"reset-all",	2,	dummy_cb},
-	{"list",	2,	list_cb},
+	{"list",	2,	pax_list_cb},
 	{NULL,		0,	NULL}
 };
 
 static int
-dummy_cb(int argc, char **argv)
+dummy_cb(int *argc, char ***argv)
 {
 
 	errx(-1, "dummy_cb");
 }
 
 static int
-enable_disable(int argc, char **argv, int state)
+enable_disable(int *argc, char ***argv, int state)
 {
 	char *feature;
 	char *file;
 	struct stat st;
 
-	if (argc < 3)
+	if (*argc < 3)
 		err(-1, "bar");
 
-	feature = argv[1];
-	file = argv[2];
 
-	if (lstat(file, &st))
-		perror("file!");
+	feature = (*argv)[1];
+	file = (*argv)[2];
+
+	*argc -= 2;
+	*argv += 2;
+
+	if (lstat(file, &st)) {
+		fprintf(stderr, "missing file: %s\n", file);
+		return (1);
+	}
 
 	hbsdcontrol_set_feature_state(file, feature, state);
 
@@ -103,20 +128,26 @@ enable_disable(int argc, char **argv, int state)
 }
 
 static int
-list(int argc, char **argv)
+pax_list(int *argc, char ***argv)
 {
 	char *feature;
 	char *file;
 	char *dummy;
 	struct stat st;
 
-	if (argc < 2)
+	if (*argc < 2)
 		err(-1, "bar");
 
-	file = argv[1];
 
-	if (lstat(file, &st))
-		errx(-1, "file!");
+	file = (*argv)[1];
+
+	(*argc)--;
+	(*argv)--;
+	
+	if (lstat(file, &st)) {
+		fprintf(stderr, "missing file: %s\n", file);
+		return (1);
+	}
 
 
 	hbsdcontrol_list_features(file, &dummy);
@@ -125,69 +156,106 @@ list(int argc, char **argv)
 }
 
 static int
-enable_cb(int argc, char **argv)
+pax_enable_cb(int *argc, char ***argv)
 {
 
 	return (enable_disable(argc, argv, enable));
 }
 
 static int
-disable_cb(int argc, char **argv)
+pax_disable_cb(int *argc, char ***argv)
 {
 
 	return (enable_disable(argc, argv, disable));
 }
 
 static int
-rm_fsea(int argc, char **argv)
+pax_rm_fsea(int *argc, char ***argv)
 {
 	int i;
 	int error;
 	char *feature;
 	char *file;
 
-	if (argc < 3)
+	if (*argc < 3)
 		err(-1, "baz");
 
-	feature = argv[1];
-	file = argv[2];
+	feature = (*argv)[1];
+	file = (*argv)[2];
 
-
-
+	(*argc)--;
+	*argv += 2;
+	
 	return (hbsdcontrol_rm_feature_state(file, feature));
 }
 
 static int
-reset_cb(int argc, char **argv)
+pax_reset_cb(int *argc, char ***argv)
 {
 
-	return (rm_fsea(argc, argv));
+	return (pax_rm_fsea(argc, argv));
 }
 
 static int
-list_cb(int argc, char **argv)
+pax_list_cb(int *argc, char ***argv)
 {
 
-	return (list(argc, argv));
+	return (pax_list(argc, argv));
 }
 
-static void __dead2
-usage(void)
+static void
+pax_usage(bool terminate)
 {
 	int i;
 
 	fprintf(stderr, "usage:\n");
-	for (i = 0; hbsdcontrol_commands[i].cmd != NULL; i++) {
-		if (hbsdcontrol_commands[i].min_argc == 2)
-			fprintf(stderr, "\thbsdcontrol %s file\n",
-			    hbsdcontrol_commands[i].cmd);
+	for (i = 0; hbsdcontrol_pax_actions[i].action != NULL; i++) {
+		if (hbsdcontrol_pax_actions[i].min_argc == 2)
+			fprintf(stderr, "\thbsdcontrol pax %s file\n",
+			    hbsdcontrol_pax_actions[i].action);
 		else
-			fprintf(stderr, "\thbsdcontrol %s feature file\n",
-			    hbsdcontrol_commands[i].cmd);
+			fprintf(stderr, "\thbsdcontrol pax %s feature file\n",
+			    hbsdcontrol_pax_actions[i].action);
+	}
+
+	if (terminate)
+		exit(-1);
+}
+
+static int 
+pax_cb(int *argc, char ***argv)
+{
+	int i;
+
+	if (*argc < 2)
+		return (1);
+
+	for (i = 0; hbsdcontrol_pax_actions[i].action != NULL; i++) {
+		if (!strcmp(*argv[0], hbsdcontrol_pax_actions[i].action)) {
+			if (*argc < hbsdcontrol_pax_actions[i].min_argc)
+				pax_usage(true);
+
+			return (hbsdcontrol_pax_actions[i].fn(argc, argv));
+		}
+	}
+
+	return (1);
+}
+
+
+
+static void
+usage(void)
+{
+	int i;
+
+	for (i = 0; hbsdcontrol_commands[i].cmd != NULL; i++) {
+		hbsdcontrol_commands[i].usage(false);
 	}
 
 	exit(-1);
 }
+
 
 int
 main(int argc, char **argv)
@@ -195,7 +263,7 @@ main(int argc, char **argv)
 	int i;
 	int ch;
 
-	while ((ch = getopt(argc, argv, "fhiv")) != -1) {
+	while ((ch = getopt(argc, argv, "fhikv")) != -1) {
 		switch (ch) {
 		case 'f':
 			flag_force = true;
@@ -206,6 +274,9 @@ main(int argc, char **argv)
 		case 'v':
 			flag_verbose < 3 ? flag_verbose++ : 0;
 			hbsdcontrol_set_verbose(flag_verbose);
+			break;
+		case 'k':
+			flag_keepgoing = true;
 			break;
 		case 'h':
 		default:
@@ -223,18 +294,18 @@ main(int argc, char **argv)
 	while (argc > 0) {
 		for (i = 0; hbsdcontrol_commands[i].cmd != NULL; i++) {
 			if (!strcmp(argv[0], hbsdcontrol_commands[i].cmd)) {
-				if (argc < hbsdcontrol_commands[i].min_argc)
-					usage();
-				hbsdcontrol_commands[i].fn(argc, argv);
-				argc -= hbsdcontrol_commands[i].min_argc;
-				argv += hbsdcontrol_commands[i].min_argc;
-				
-				return (0);
+				argv++;
+				argc--;
+
+				if (hbsdcontrol_commands[i].fn(&argc, &argv) != 0) {
+					if (hbsdcontrol_commands[i].usage)
+						hbsdcontrol_commands[i].usage(flag_keepgoing ? false : true);
+				}
 			}
 		}
 
-		argc--;
 		argv++;
+		argc--;
 	}
 
 	printf("%i\n", argc);

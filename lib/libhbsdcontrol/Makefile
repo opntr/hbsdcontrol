@@ -6,7 +6,7 @@ SHLIB_MAJOR=	0
 
 HBSDCONTROL_DIR= ${.CURDIR}/../../contrib/hardenedbsd/hbsdcontrol
 
-CFLAGS+= ${HBSDCONTROL_DIR}
+#CFLAGS+= ${HBSDCONTROL_DIR}
 
 SRCS=	${HBSDCONTROL_DIR}/hbsdcontrol.c
 INCS=	${HBSDCONTROL_DIR}/hbsdcontrol.h
