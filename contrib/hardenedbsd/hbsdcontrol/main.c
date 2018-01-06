@@ -183,7 +183,7 @@ pax_rm_fsea(int *argc, char ***argv)
 	feature = (*argv)[1];
 	file = (*argv)[2];
 
-	(*argc)--;
+	(*argc) -= 2;
 	*argv += 2;
 	
 	return (hbsdcontrol_rm_feature_state(file, feature));
