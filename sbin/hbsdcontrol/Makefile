@@ -1,5 +1,7 @@
 PROG=hbsdcontrol
 
+BINDIR?=   /sbin
+
 HBSDCONTROL_DIR= ${.CURDIR}/../../contrib/hardenedbsd/hbsdcontrol
 
 CFLAGS+= -I${HBSDCONTROL_DIR}
