@@ -48,10 +48,14 @@
 
 #include "hbsdcontrol.h"
 
-bool flag_force = false;
-int flag_debug = 0;
-bool flag_immutable = false;
-bool flag_keepgoing = false;
+#define	HBSDCONTROL_VERSION	"v000"
+
+static bool flag_force = false;
+static int flag_debug = 0;
+static bool flag_immutable = false;
+static bool flag_keepgoing = false;
+static bool flag_usage= false;
+static bool flag_version = false;
 
 static void usage(void);
 
@@ -258,6 +262,13 @@ usage(void)
 	exit(-1);
 }
 
+static void
+version(void)
+{
+	printf("hbsdcontrol version: %s\n", HBSDCONTROL_VERSION);
+	printf("libhbsdcontrol version: %s\n", hbsdcontrol_get_version());
+}
+
 
 int
 main(int argc, char **argv)
@@ -268,7 +279,7 @@ main(int argc, char **argv)
 	if (argc == 1)
 		usage();
 
-	while ((ch = getopt(argc, argv, "dfhik")) != -1) {
+	while ((ch = getopt(argc, argv, "dfhikv")) != -1) {
 		switch (ch) {
 		case 'd':
 			flag_debug++;
@@ -276,13 +287,18 @@ main(int argc, char **argv)
 		case 'f':
 			flag_force = true;
 			break;
+		case 'h':
+			flag_usage = true;
+			break;
 		case 'i':
 			flag_immutable = true;
 			break;
 		case 'k':
 			flag_keepgoing = true;
 			break;
-		case 'h':
+		case 'v':
+			flag_version = true;
+			break;
 		default:
 			usage();
 		}
@@ -294,6 +310,19 @@ main(int argc, char **argv)
 	if (flag_debug > 0) {
 		hbsdcontrol_set_debug(flag_debug);
 	}
+
+	if (flag_version) {
+		version();
+		exit(0);
+	}
+
+	if (flag_usage) {
+		if (flag_debug) {
+			version();
+		}
+		usage();
+	}
+
 
 	if (getuid() != 0) {
 		errx(-1, "!root");

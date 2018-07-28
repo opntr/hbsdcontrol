@@ -65,4 +65,6 @@ int hbsdcontrol_list_features(const char *file, char **features);
 
 int hbsdcontrol_set_debug(const int level);
 
+const char *hbsdcontrol_get_version(void);
+
 #endif /* __HBSDCONTROL_H */

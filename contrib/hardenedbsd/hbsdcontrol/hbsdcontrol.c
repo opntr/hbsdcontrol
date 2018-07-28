@@ -44,6 +44,7 @@
 
 #include "hbsdcontrol.h"
 
+static const char *hbsdcontrol_version = "v001";
 
 static int hbsdcontrol_validate_state(struct pax_feature_state *feature_state);
 static const char * hbsdcontrol_get_state_string(const struct pax_feature_state *feature_state);
@@ -97,6 +98,12 @@ const struct pax_feature_entry pax_features[] = {
 	{NULL, {0, 0}}
 };
 
+
+const char *
+hbsdcontrol_get_version(void)
+{
+	return hbsdcontrol_version;
+}
 
 int
 hbsdcontrol_set_extattr(const char *file, const char *attr, const int val)
