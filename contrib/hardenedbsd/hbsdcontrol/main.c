@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2015-2017 Oliver Pinter <oliver.pinter@HardenedBSD.org>
+ * Copyright (c) 2015-2018 Oliver Pinter <oliver.pinter@HardenedBSD.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@
  */
 
 /*
- * Warning: this file currently is just a stub, to test libhbsdcontrol!
+ * Warning: currently this file is just a thin wrapper around libhbsdcontrol!
  */
 
 #include <sys/types.h>
@@ -86,9 +86,10 @@ const struct hbsdcontrol_command_entry hbsdcontrol_commands[] = {
 const struct hbsdcontrol_action_entry hbsdcontrol_pax_actions[] = {
 	{"enable",	3,	pax_enable_cb},
 	{"disable",	3,	pax_disable_cb},
-	{"status",	3,	dummy_cb},
+//	{"status",	3,	dummy_cb},
 	{"reset",	3,	pax_reset_cb},
-	{"reset-all",	2,	dummy_cb},
+	{"sysdef",	3,	pax_reset_cb},
+//	{"reset-all",	2,	dummy_cb},
 	{"list",	2,	pax_list_cb},
 	{NULL,		0,	NULL}
 };
@@ -175,8 +176,6 @@ pax_disable_cb(int *argc, char ***argv)
 static int
 pax_rm_fsea(int *argc, char ***argv)
 {
-	int i;
-	int error;
 	char *feature;
 	char *file;
 
@@ -265,6 +264,9 @@ main(int argc, char **argv)
 {
 	int i;
 	int ch;
+
+	if (argc == 1)
+		usage();
 
 	while ((ch = getopt(argc, argv, "fhikv")) != -1) {
 		switch (ch) {
