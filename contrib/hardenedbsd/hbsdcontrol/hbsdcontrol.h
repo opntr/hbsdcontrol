@@ -63,6 +63,6 @@ int hbsdcontrol_get_feature_state(const char *file, const char *feature, enum fe
 int hbsdcontrol_rm_feature_state(const char *file, const char *feature);
 int hbsdcontrol_list_features(const char *file, char **features);
 
-int hbsdcontrol_set_verbose(const int level);
+int hbsdcontrol_set_debug(const int level);
 
 #endif /* __HBSDCONTROL_H */

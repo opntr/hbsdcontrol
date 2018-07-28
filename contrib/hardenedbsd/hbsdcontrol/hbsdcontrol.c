@@ -48,7 +48,7 @@
 static int hbsdcontrol_validate_state(struct pax_feature_state *feature_state);
 static const char * hbsdcontrol_get_state_string(const struct pax_feature_state *feature_state);
 
-static int hbsdcontrol_verbose_flag;
+static int hbsdcontrol_debug_flag;
 
 const struct pax_feature_entry pax_features[] = {
 	{
@@ -116,7 +116,7 @@ hbsdcontrol_set_extattr(const char *file, const char *attr, const int val)
 
 	len = extattr_set_file(file, attrnamespace, attr,
 	    sbuf_data(attrval), sbuf_len(attrval));
-	if (len >= 0 && hbsdcontrol_verbose_flag)
+	if (len >= 0 && hbsdcontrol_debug_flag)
 		warnx("%s: %s@%s = %s", file, "system", attr, sbuf_data(attrval));
 
 	sbuf_delete(attrval);
@@ -152,7 +152,7 @@ hbsdcontrol_get_extattr(const char *file, const char *attr, int *val)
 	}
 
 #if 0
-	if (len >= 0 && hbsdcontrol_verbose_flag)
+	if (len >= 0 && hbsdcontrol_debug_flag)
 		warnx("%s: %s@%s = %s", file, "system", attr, sbuf_data(attrval));
 #endif
 
@@ -187,7 +187,7 @@ hbsdcontrol_rm_extattr(const char *file, const char *attr)
 	if (error)
 		err(-1, "%s", "system");
 
-	if (hbsdcontrol_verbose_flag)
+	if (hbsdcontrol_debug_flag)
 		printf("reset attr: %s on file: %s\n", attr, file);
 
 	error = extattr_delete_file(file, attrnamespace, attr);
@@ -219,7 +219,7 @@ hbsdcontrol_list_extattrs(const char *file, char ***attrs)
 	if (error)
 		err(-1, "%s", "system");
 
-	if (hbsdcontrol_verbose_flag)
+	if (hbsdcontrol_debug_flag)
 		printf("list attrs on file: %s\n", file);
 
 	nbytes = extattr_list_file(file, attrnamespace, NULL, 0);
@@ -265,7 +265,7 @@ hbsdcontrol_list_extattrs(const char *file, char ***attrs)
 				}
 
 				if (!memcmp(pax_features[feature].extattr[state], &data[pos], attr_len)) {
-					if (hbsdcontrol_verbose_flag)
+					if (hbsdcontrol_debug_flag)
 						printf("%s:\tfound attribute: %s\n",
 						    __func__, pax_features[feature].extattr[state]);
 					(*attrs)[fpos] = strdup(pax_features[feature].extattr[state]);
@@ -300,7 +300,7 @@ hbsdcontrol_set_feature_state(const char *file, const char *feature, pax_feature
 
 	for (i = 0; pax_features[i].feature != NULL; i++) {
 		if (strcmp(pax_features[i].feature, feature) == 0) {
-			if (hbsdcontrol_verbose_flag) {
+			if (hbsdcontrol_debug_flag) {
 				printf("%s:\t%s %s on %s\n",
 				    __func__,
 				    state ? "enable" : "disable",
@@ -328,7 +328,7 @@ hbsdcontrol_rm_feature_state(const char *file, const char *feature)
 
 	for (i = 0; pax_features[i].feature != NULL; i++) {
 		if (!strcmp(pax_features[i].feature, feature)) {
-			if (hbsdcontrol_verbose_flag)
+			if (hbsdcontrol_debug_flag)
 				printf("%s:\treset %s on %s\n",
 				    __func__,
 				    pax_features[i].feature, file);
@@ -370,7 +370,7 @@ hbsdcontrol_get_all_feature_state(const char *file, struct pax_feature_state **f
 				if (!strcmp(pax_features[feature].extattr[state], attrs[attr])) {
 					hbsdcontrol_get_extattr(file, attrs[attr], &val);
 
-					if (hbsdcontrol_verbose_flag)
+					if (hbsdcontrol_debug_flag)
 						printf("%s:\t%s (%s: %d)\n",
 						    __func__,
 						    pax_features[feature].feature, attrs[attr], val);
@@ -483,10 +483,10 @@ hbsdcontrol_get_state_string(const struct pax_feature_state *feature_state)
 }
 
 int
-hbsdcontrol_set_verbose(const int level)
+hbsdcontrol_set_debug(const int level)
 {
 
-	hbsdcontrol_verbose_flag = level;
+	hbsdcontrol_debug_flag = level;
 
-	return (hbsdcontrol_verbose_flag);
+	return (hbsdcontrol_debug_flag);
 }

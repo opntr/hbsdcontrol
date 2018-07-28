@@ -49,7 +49,7 @@
 #include "hbsdcontrol.h"
 
 bool flag_force = false;
-int flag_verbose = 0;
+int flag_debug = 0;
 bool flag_immutable = false;
 bool flag_keepgoing = false;
 
@@ -268,17 +268,16 @@ main(int argc, char **argv)
 	if (argc == 1)
 		usage();
 
-	while ((ch = getopt(argc, argv, "fhikv")) != -1) {
+	while ((ch = getopt(argc, argv, "dfhik")) != -1) {
 		switch (ch) {
+		case 'd':
+			flag_debug++;
+			break;
 		case 'f':
 			flag_force = true;
 			break;
 		case 'i':
 			flag_immutable = true;
-			break;
-		case 'v':
-			flag_verbose < 3 ? flag_verbose++ : 0;
-			hbsdcontrol_set_verbose(flag_verbose);
 			break;
 		case 'k':
 			flag_keepgoing = true;
@@ -291,6 +290,10 @@ main(int argc, char **argv)
 
 	argc -= optind;
 	argv += optind;
+
+	if (flag_debug > 0) {
+		hbsdcontrol_set_debug(flag_debug);
+	}
 
 	if (getuid() != 0) {
 		errx(-1, "!root");
@@ -313,7 +316,7 @@ main(int argc, char **argv)
 		argc--;
 	}
 
-	if (flag_verbose > 0)
+	if (flag_debug > 0)
 		printf("argc at the end: %i\n", argc);
 
 	return (0);
