@@ -143,7 +143,7 @@ pax_list(int *argc, char ***argv)
 
 	(*argc)--;
 	(*argv)--;
-	
+
 	if (lstat(file, &st)) {
 		fprintf(stderr, "missing file: %s\n", file);
 		return (1);
@@ -185,7 +185,7 @@ pax_rm_fsea(int *argc, char ***argv)
 
 	(*argc) -= 2;
 	*argv += 2;
-	
+
 	return (hbsdcontrol_rm_feature_state(file, feature));
 }
 
@@ -222,7 +222,7 @@ pax_usage(bool terminate)
 		exit(-1);
 }
 
-static int 
+static int
 pax_cb(int *argc, char ***argv)
 {
 	int i;
@@ -308,7 +308,8 @@ main(int argc, char **argv)
 		argc--;
 	}
 
-	printf("%i\n", argc);
+	if (flag_verbose > 0)
+		printf("argc at the end: %i\n", argc);
 
 	return (0);
 }

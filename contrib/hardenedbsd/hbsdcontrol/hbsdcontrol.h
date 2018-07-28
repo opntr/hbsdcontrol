@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2015-2017 Oliver Pinter <oliver.pinter@HardenedBSD.org>
+ * Copyright (c) 2015-2018 Oliver Pinter <oliver.pinter@HardenedBSD.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,8 @@ enum feature_state {
 	conflict = 666
 };
 
+typedef enum feature_state pax_feature_state_t;
+
 struct pax_feature_entry {
 	const char	*feature;
 	const char	*extattr[2];
@@ -45,7 +47,7 @@ struct pax_feature_state {
 	char	*feature;
 	struct {
 		char	*extattr;
-		enum feature_state	 state;
+		pax_feature_state_t	 state;
 	} internal[2];
 	int	state;
 };

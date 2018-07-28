@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2015-2017 Oliver Pinter <oliver.pinter@HardenedBSD.org>
+ * Copyright (c) 2015-2018 Oliver Pinter <oliver.pinter@HardenedBSD.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,6 +46,7 @@
 
 
 static int hbsdcontrol_validate_state(struct pax_feature_state *feature_state);
+static const char * hbsdcontrol_get_state_string(struct pax_feature_state *feature_state);
 
 static int hbsdcontrol_verbose_flag;
 
@@ -96,7 +97,7 @@ const struct pax_feature_entry pax_features[] = {
 	{NULL, {0, 0}}
 };
 
-	
+
 int
 hbsdcontrol_set_extattr(const char *file, const char *attr, const int val)
 {
@@ -244,11 +245,9 @@ hbsdcontrol_list_extattrs(const char *file, char ***attrs)
 		error = EFAULT;
 		goto out;
 	}
-	
+
 	pos = 0;
 	while (pos < nbytes) {
-		int i;
-		int j;
 		size_t attr_len;
 
 		assert(fpos < nitems(pax_features) * nitems(pax_features[0].extattr));
@@ -256,21 +255,20 @@ hbsdcontrol_list_extattrs(const char *file, char ***attrs)
 		/* see EXTATTR(2) about the data structure */
 		len = data[pos++];
 
-		/* Yes, this isn't an optimized algorithm. */
-		for (i = 0; pax_features[i].feature != NULL; i++) {
-			/* The 2 comes from enum pax_attr_state's size */
-			for (j = 0; j < 2; j++) {
-				attr_len = strlen(pax_features[i].extattr[j]);
+		for (int feature = 0; pax_features[feature].feature != NULL; feature++) {
+			/* The value 2 comes from enum pax_attr_state's size */
+			for (pax_feature_state_t state = 0; state < 2; state++) {
+				attr_len = strlen(pax_features[feature].extattr[state]);
 				if (attr_len != len) {
 					/* Fast path, skip if the size of attribute differs. */
 					continue;
 				}
 
-				if (!memcmp(pax_features[i].extattr[j], &data[pos], attr_len)) {
-					if (hbsdcontrol_verbose_flag) {
-						printf("\tfound attribute: %s\n", pax_features[i].extattr[j]);
-					}
-					(*attrs)[fpos] = strdup(pax_features[i].extattr[j]);
+				if (!memcmp(pax_features[feature].extattr[state], &data[pos], attr_len)) {
+					if (hbsdcontrol_verbose_flag)
+						printf("%s:\tfound attribute: %s\n",
+						    __func__, pax_features[feature].extattr[state]);
+					(*attrs)[fpos] = strdup(pax_features[feature].extattr[state]);
 					fpos++;
 				}
 			}
@@ -293,7 +291,7 @@ out:
 }
 
 int
-hbsdcontrol_set_feature_state(const char *file, const char *feature, enum feature_state state)
+hbsdcontrol_set_feature_state(const char *file, const char *feature, pax_feature_state_t state)
 {
 	int i;
 	int error;
@@ -303,7 +301,8 @@ hbsdcontrol_set_feature_state(const char *file, const char *feature, enum featur
 	for (i = 0; pax_features[i].feature != NULL; i++) {
 		if (strcmp(pax_features[i].feature, feature) == 0) {
 			if (hbsdcontrol_verbose_flag) {
-				printf("%s %s on %s\n",
+				printf("%s:\t%s %s on %s\n",
+				    __func__,
 				    state ? "enable" : "disable",
 				    pax_features[i].feature, file);
 			}
@@ -329,8 +328,9 @@ hbsdcontrol_rm_feature_state(const char *file, const char *feature)
 
 	for (i = 0; pax_features[i].feature != NULL; i++) {
 		if (!strcmp(pax_features[i].feature, feature)) {
-			if (hbsdcontrol_verbose_flag) 
-				printf("reset %s on %s\n",
+			if (hbsdcontrol_verbose_flag)
+				printf("%s:\treset %s on %s\n",
+				    __func__,
 				    pax_features[i].feature, file);
 			error = hbsdcontrol_rm_extattr(file, pax_features[i].extattr[disable]);
 			error |= hbsdcontrol_rm_extattr(file, pax_features[i].extattr[enable]);
@@ -346,7 +346,7 @@ hbsdcontrol_rm_feature_state(const char *file, const char *feature)
 int
 hbsdcontrol_get_all_feature_state(const char *file, struct pax_feature_state **feature_states)
 {
-	int i, j, k, l;
+	int l;
 	int error;
 	char **attrs;
 	int val;
@@ -366,37 +366,37 @@ hbsdcontrol_get_all_feature_state(const char *file, struct pax_feature_state **f
 	if (attrs == NULL)
 		err(-1, "attrs == NULL");
 
-	/*
-	 * Ezt itt kellene optimalizalni, hogy az atts legyen kivul,
-	 * viszont csak akkor kellene novelni az l-t ha ..
-	 */
-	for (j = 0; pax_features[j].feature != NULL; j++) {
-		for (i = 0; attrs[i] != NULL; i++) {
-			for (k = 0; k < 2; k++) {
-				if (!strcmp(pax_features[j].extattr[k], attrs[i])) {
+	for (int feature = 0; pax_features[feature].feature != NULL; feature++) {
+		for (int attr = 0; attrs[attr] != NULL; attr++) {
+			for (pax_feature_state_t state = 0; state < 2; state++) {
+				if (!strcmp(pax_features[feature].extattr[state], attrs[attr])) {
+					hbsdcontrol_get_extattr(file, attrs[attr], &val);
 
-					hbsdcontrol_get_extattr(file, attrs[i], &val);
 					if (hbsdcontrol_verbose_flag)
-						printf("%s (%s: %d)\n", pax_features[j].feature, attrs[i], val);
+						printf("%s:\t%s (%s: %d)\n",
+						    __func__,
+						    pax_features[feature].feature, attrs[attr], val);
 
 					assert(l < nitems(pax_features));
 
 					if ((*feature_states)[l].feature == NULL)
-						(*feature_states)[l].feature = strdup(pax_features[j].feature);
-					(*feature_states)[l].internal[k].state = val;	
-					(*feature_states)[l].internal[k].extattr = strdup(pax_features[j].extattr[k]);
-					(*feature_states)[l].state = hbsdcontrol_validate_state(&(*feature_states)[l]);
+						(*feature_states)[l].feature = strdup(pax_features[feature].feature);
+					(*feature_states)[l].internal[state].state = val;
+					(*feature_states)[l].internal[state].extattr = strdup(pax_features[feature].extattr[state]);
 					found = true;
 				}
 			}
 		}
-		l = found ? l+1 : l;
-		found = false;
+		if (found) {
+			(*feature_states)[l].state = hbsdcontrol_validate_state(&(*feature_states)[l]);
+			l++;
+			found = false;
+		}
 	}
 
-	for (i = 0; attrs[i] != NULL; i++) {
-		free(attrs[i]);
-		attrs[i] = NULL;
+	for (int attr = 0; attrs[attr] != NULL; attr++) {
+		free(attrs[attr]);
+		attrs[attr] = NULL;
 	}
 	free(attrs);
 	attrs = NULL;
@@ -409,29 +409,32 @@ int
 hbsdcontrol_list_features(const char *file, char **features)
 {
 	struct pax_feature_state	*feature_states;
-	int i, j;
+	struct sbuf *list = NULL;
 
-	hbsdcontrol_get_all_feature_state(file, &feature_states);
+	if (hbsdcontrol_get_all_feature_state(file, &feature_states) != 0)
+		return (1);
 
-	for (i = 0; i < nitems(pax_features); i++) {
-		if (feature_states[i].feature == NULL)
+	list = sbuf_new_auto();
+	for (int feature = 0; feature < nitems(pax_features); feature++) {
+		if (feature_states[feature].feature == NULL)
 			continue;
 
-		printf("%s\t", feature_states[i].feature);
-		for (j = 0; j < 2; j++) {
-			printf("%s: %d\t", feature_states[i].internal[j].extattr,
-			    feature_states[i].internal[j].state);
+		sbuf_printf(list, "%s\t", feature_states[feature].feature);
+		for (pax_feature_state_t state = 0; state < 2; state++) {
+			printf("%s: %d\t", feature_states[feature].internal[state].extattr,
+			    feature_states[feature].internal[state].state);
 		}
-		printf("->\t%d\n", feature_states[i].state);
+		printf("->\t%d\n", feature_states[feature].state);
 	}
+	sbuf_finish(list);
 
 	// factor this out to pax_feature_states_free(struct pax_feature_states **ctx)
-	for (i = 0; i < nitems(pax_features); i++) {
-		free(feature_states[i].feature);
-		feature_states[i].feature = NULL;
-		for (j = 0; j < 2; j++) {
-			free(feature_states[i].internal[j].extattr);
-			feature_states[i].internal[j].extattr = NULL;
+	for (int feature = 0; feature < nitems(pax_features); feature++) {
+		free(feature_states[feature].feature);
+		feature_states[feature].feature = NULL;
+		for (pax_feature_state_t state = 0; state < 2; state++) {
+			free(feature_states[feature].internal[state].extattr);
+			feature_states[feature].internal[state].extattr = NULL;
 		}
 	}
 
@@ -442,7 +445,7 @@ static int
 hbsdcontrol_validate_state(struct pax_feature_state *feature_state)
 {
 	int state = -1;
-	enum feature_state negated_feature, feature;
+	pax_feature_state_t negated_feature, feature;
 
 	assert(feature_state != NULL);
 
@@ -461,6 +464,22 @@ hbsdcontrol_validate_state(struct pax_feature_state *feature_state)
 		assert(false);
 
 	return (state);
+}
+
+static const char *
+hbsdcontrol_get_state_string(struct pax_feature_state *feature_state)
+{
+
+	switch (feature_state->state) {
+	case enable:
+		return "enabled";
+	case disable:
+		return "disabled";
+	case conflict:
+		return "conflict";
+	}
+
+	return "unknown";
 }
 
 int
