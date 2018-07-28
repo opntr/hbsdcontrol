@@ -46,7 +46,7 @@
 
 
 static int hbsdcontrol_validate_state(struct pax_feature_state *feature_state);
-static const char * hbsdcontrol_get_state_string(struct pax_feature_state *feature_state);
+static const char * hbsdcontrol_get_state_string(const struct pax_feature_state *feature_state);
 
 static int hbsdcontrol_verbose_flag;
 
@@ -411,6 +411,8 @@ hbsdcontrol_list_features(const char *file, char **features)
 	struct pax_feature_state	*feature_states;
 	struct sbuf *list = NULL;
 
+	assert(*features == NULL);
+
 	if (hbsdcontrol_get_all_feature_state(file, &feature_states) != 0)
 		return (1);
 
@@ -419,14 +421,12 @@ hbsdcontrol_list_features(const char *file, char **features)
 		if (feature_states[feature].feature == NULL)
 			continue;
 
-		sbuf_printf(list, "%s\t", feature_states[feature].feature);
-		for (pax_feature_state_t state = 0; state < 2; state++) {
-			printf("%s: %d\t", feature_states[feature].internal[state].extattr,
-			    feature_states[feature].internal[state].state);
-		}
-		printf("->\t%d\n", feature_states[feature].state);
+		sbuf_printf(list, "%s:\t%s\n",
+		    feature_states[feature].feature,
+		    hbsdcontrol_get_state_string(&feature_states[feature]));
 	}
 	sbuf_finish(list);
+	asprintf(features, "%s", sbuf_data(list));
 
 	// factor this out to pax_feature_states_free(struct pax_feature_states **ctx)
 	for (int feature = 0; feature < nitems(pax_features); feature++) {
@@ -467,7 +467,7 @@ hbsdcontrol_validate_state(struct pax_feature_state *feature_state)
 }
 
 static const char *
-hbsdcontrol_get_state_string(struct pax_feature_state *feature_state)
+hbsdcontrol_get_state_string(const struct pax_feature_state *feature_state)
 {
 
 	switch (feature_state->state) {

@@ -130,9 +130,8 @@ enable_disable(int *argc, char ***argv, int state)
 static int
 pax_list(int *argc, char ***argv)
 {
-	char *feature;
 	char *file;
-	char *dummy;
+	char *features;
 	struct stat st;
 
 	if (*argc < 2)
@@ -140,6 +139,8 @@ pax_list(int *argc, char ***argv)
 
 
 	file = (*argv)[1];
+
+	features = NULL;
 
 	(*argc)--;
 	(*argv)--;
@@ -150,7 +151,9 @@ pax_list(int *argc, char ***argv)
 	}
 
 
-	hbsdcontrol_list_features(file, &dummy);
+	hbsdcontrol_list_features(file, &features);
+	printf("%s", features);
+	free(features);
 
 	return (0);
 }
