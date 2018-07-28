@@ -48,6 +48,8 @@ static const char *hbsdcontrol_version = "v001";
 
 static int hbsdcontrol_validate_state(struct pax_feature_state *feature_state);
 static const char * hbsdcontrol_get_state_string(const struct pax_feature_state *feature_state);
+static int hbsdcontrol_get_all_feature_state(const char *file, struct pax_feature_state **feature_states);
+static void hbsdcontrol_free_all_feature_state(struct pax_feature_state **feature_states);
 
 static int hbsdcontrol_debug_flag;
 
@@ -290,12 +292,27 @@ hbsdcontrol_list_extattrs(const char *file, char ***attrs)
 out:
 	free(data);
 	if (error) {
-		free(*attrs);
-		*attrs = NULL;
+		hbsdcontrol_free_attrs(attrs);
 	}
 
 	return (error);
 }
+
+
+void
+hbsdcontrol_free_attrs(char ***attrs)
+{
+	if (*attrs == NULL)
+		return;
+
+	for (int attr = 0; (*attrs)[attr] != NULL; attr++) {
+		free((*attrs)[attr]);
+		(*attrs)[attr] = NULL;
+	}
+	free(*attrs);
+	*attrs = NULL;
+}
+
 
 int
 hbsdcontrol_set_feature_state(const char *file, const char *feature, pax_feature_state_t state)
@@ -350,7 +367,7 @@ hbsdcontrol_rm_feature_state(const char *file, const char *feature)
 }
 
 
-int
+static int
 hbsdcontrol_get_all_feature_state(const char *file, struct pax_feature_state **feature_states)
 {
 	int error;
@@ -399,17 +416,34 @@ hbsdcontrol_get_all_feature_state(const char *file, struct pax_feature_state **f
 		}
 	}
 
-	for (int attr = 0; attrs[attr] != NULL; attr++) {
-		free(attrs[attr]);
-		attrs[attr] = NULL;
-	}
-	free(attrs);
-	attrs = NULL;
+	hbsdcontrol_free_attrs(&attrs);
 
 	return (error);
 }
 
 
+static void
+hbsdcontrol_free_all_feature_state(struct pax_feature_state **feature_states)
+{
+	if (*feature_states == NULL)
+		return;
+
+	for (int feature = 0; feature < nitems(pax_features); feature++) {
+		free((*feature_states)[feature].feature);
+		(*feature_states)[feature].feature = NULL;
+		for (pax_feature_state_t state = 0; state < 2; state++) {
+			free((*feature_states)[feature].internal[state].extattr);
+			(*feature_states)[feature].internal[state].extattr = NULL;
+		}
+	}
+}
+
+/*
+ * XXXOP: currently this returns one string with all of the
+ * features and its state. In the future it would be better
+ * to return an array of strings with the {feature, value}
+ * pairs.
+ */
 int
 hbsdcontrol_list_features(const char *file, char **features)
 {
@@ -433,17 +467,17 @@ hbsdcontrol_list_features(const char *file, char **features)
 	sbuf_finish(list);
 	asprintf(features, "%s", sbuf_data(list));
 
-	// factor this out to pax_feature_states_free(struct pax_feature_states **ctx)
-	for (int feature = 0; feature < nitems(pax_features); feature++) {
-		free(feature_states[feature].feature);
-		feature_states[feature].feature = NULL;
-		for (pax_feature_state_t state = 0; state < 2; state++) {
-			free(feature_states[feature].internal[state].extattr);
-			feature_states[feature].internal[state].extattr = NULL;
-		}
-	}
+	hbsdcontrol_free_all_feature_state(&feature_states);
 
 	return (0);
+}
+
+void
+hbsdcontrol_free_features(char **features)
+{
+
+	free(*features);
+	*features = NULL;
 }
 
 static int

@@ -158,7 +158,7 @@ pax_list(int *argc, char ***argv)
 
 	hbsdcontrol_list_features(file, &features);
 	printf("%s", features);
-	free(features);
+	hbsdcontrol_free_features(&features);
 
 	return (0);
 }

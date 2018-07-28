@@ -64,6 +64,9 @@ int hbsdcontrol_set_feature_state(const char *file, const char *feature, pax_fea
 int hbsdcontrol_list_features(const char *file, char **features);
 int hbsdcontrol_rm_feature_state(const char *file, const char *feature);
 
+void hbsdcontrol_free_attrs(char ***attrs);
+void hbsdcontrol_free_features(char **features);
+
 int hbsdcontrol_set_debug(const int level);
 
 const char *hbsdcontrol_get_version(void);

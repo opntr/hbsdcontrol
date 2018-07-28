@@ -31,12 +31,14 @@
 .Sh NAME
 .Nm hbsdcontrol_get_extattr ,
 .Nm hbsdcontrol_set_extattr ,
-.Nm hbsdcontrol_list_extattr ,
 .Nm hbsdcontrol_rm_extattr ,
+.Nm hbsdcontrol_list_extattrs ,
+.Nm hbsdcontrol_free_extattrs ,
 .Nm hbsdcontrol_get_feature_state ,
 .Nm hbsdcontrol_set_feature_state ,
-.Nm hbsdcontrol_list_feature_state ,
 .Nm hbsdcontrol_rm_feature_state ,
+.Nm hbsdcontrol_list_feature_states ,
+.Nm hbsdcontrol_free_feature_states ,
 .Nm hbsdcontrol_set_debug ,
 .Nm hbsdcontrol_get_version
 .Nd "interface for accessing the HardenedBSD's feature state control variables"
@@ -60,6 +62,10 @@
 .Fo hbsdcontrol_list_extattrs
 .Fa "const char *file" "char ***attrs"
 .Fc
+.Ft void
+.Fo hbsdcontrol_free_attrs
+.Fa "char ***attrs"
+.Fc
 .Ft int
 .Fo hbsdcontrol_get_feature_state
 .Fa "const char *file" "const char *feature" "pax_feature_state_t *state
@@ -69,12 +75,16 @@
 .Fa "const char *file" "const char *feature" "pax_feature_state_t state"
 .Fc
 .Ft int
-.Fo hbsdcontrol_list_feature_state
-.Fa "const char *file" "char **features"
-.Fc
-.Ft int
 .Fo hbsdcontrol_rm_feature_state
 .Fa "const char *file" "const char *features"
+.Fc
+.Ft int
+.Fo hbsdcontrol_list_feature_states
+.Fa "const char *file" "char **features"
+.Fc
+.Ft void
+.Fo hbsdcontrol_free_feature_states
+.Fa "char **features"
 .Fc
 .Ft const char *
 .Fo hbsdcontrol_get_version
@@ -106,6 +116,13 @@ parameter is the target file path, where the
 attriube will be created with the 
 .Fa val
 value.
+The
+.Fn hbsdcontrol_list_extattr
+allocates the required memory for the
+.Fa "attrs"
+which should be freed after the usage with
+.Fn hbsdcontrol_free_attrs
+function.
 .El
 .Sh RETURN VALUES
 .Bl
