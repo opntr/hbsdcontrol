@@ -30,10 +30,10 @@
 #define	__HBSDCONTROL_H
 
 enum feature_state {
+	conflict = -2,
+	sysdef = -1,
 	disable = 0,
 	enable = 1,
-
-	conflict = 666
 };
 
 typedef enum feature_state pax_feature_state_t;

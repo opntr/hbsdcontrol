@@ -346,7 +346,6 @@ hbsdcontrol_rm_feature_state(const char *file, const char *feature)
 int
 hbsdcontrol_get_all_feature_state(const char *file, struct pax_feature_state **feature_states)
 {
-	int l;
 	int error;
 	char **attrs;
 	int val;
@@ -354,7 +353,6 @@ hbsdcontrol_get_all_feature_state(const char *file, struct pax_feature_state **f
 
 	error = 0;
 	attrs = NULL;
-	l = 0;
 
 	assert(feature_states != NULL);
 
@@ -377,20 +375,20 @@ hbsdcontrol_get_all_feature_state(const char *file, struct pax_feature_state **f
 						    __func__,
 						    pax_features[feature].feature, attrs[attr], val);
 
-					assert(l < nitems(pax_features));
-
-					if ((*feature_states)[l].feature == NULL)
-						(*feature_states)[l].feature = strdup(pax_features[feature].feature);
-					(*feature_states)[l].internal[state].state = val;
-					(*feature_states)[l].internal[state].extattr = strdup(pax_features[feature].extattr[state]);
+					if ((*feature_states)[feature].feature == NULL)
+						(*feature_states)[feature].feature = strdup(pax_features[feature].feature);
+					(*feature_states)[feature].internal[state].state = val;
+					(*feature_states)[feature].internal[state].extattr = strdup(pax_features[feature].extattr[state]);
 					found = true;
 				}
 			}
 		}
 		if (found) {
-			(*feature_states)[l].state = hbsdcontrol_validate_state(&(*feature_states)[l]);
-			l++;
+			(*feature_states)[feature].state = hbsdcontrol_validate_state(&(*feature_states)[feature]);
 			found = false;
+		} else {
+			(*feature_states)[feature].feature = strdup(pax_features[feature].feature);
+			(*feature_states)[feature].state = sysdef;
 		}
 	}
 
@@ -477,6 +475,8 @@ hbsdcontrol_get_state_string(const struct pax_feature_state *feature_state)
 		return "disabled";
 	case conflict:
 		return "conflict";
+	case sysdef:
+		return "sysdef";
 	}
 
 	return "unknown";
