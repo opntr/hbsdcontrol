@@ -109,7 +109,7 @@ hbsdcontrol_get_version(void)
 }
 
 int
-hbsdcontrol_set_extattr(const char *file, const char *attr, const int val)
+hbsdcontrol_extattr_set_attr(const char *file, const char *attr, const int val)
 {
 	int	error;
 	int	len;
@@ -140,7 +140,7 @@ hbsdcontrol_set_extattr(const char *file, const char *attr, const int val)
 }
 
 int
-hbsdcontrol_get_extattr(const char *file, const char *attr, int *val)
+hbsdcontrol_extattr_get_attr(const char *file, const char *attr, int *val)
 {
 	int	error;
 	int	len;
@@ -187,7 +187,7 @@ hbsdcontrol_get_extattr(const char *file, const char *attr, int *val)
 
 
 int
-hbsdcontrol_rm_extattr(const char *file, const char *attr)
+hbsdcontrol_extattr_rm_attr(const char *file, const char *attr)
 {
 	int error;
 	int attrnamespace;
@@ -206,7 +206,7 @@ hbsdcontrol_rm_extattr(const char *file, const char *attr)
 
 
 int
-hbsdcontrol_list_extattrs(const char *file, char ***attrs)
+hbsdcontrol_extattr_list_attrs(const char *file, char ***attrs)
 {
 	int error;
 	int attrnamespace;
@@ -330,8 +330,8 @@ hbsdcontrol_set_feature_state(const char *file, const char *feature, pax_feature
 				    pax_features[i].feature, file);
 			}
 
-			error = hbsdcontrol_set_extattr(file, pax_features[i].extattr[disable], !state);
-			error |= hbsdcontrol_set_extattr(file, pax_features[i].extattr[enable], state);
+			error = hbsdcontrol_extattr_set_attr(file, pax_features[i].extattr[disable], !state);
+			error |= hbsdcontrol_extattr_set_attr(file, pax_features[i].extattr[enable], state);
 
 			break;
 		}
@@ -355,8 +355,8 @@ hbsdcontrol_rm_feature_state(const char *file, const char *feature)
 				printf("%s:\treset %s on %s\n",
 				    __func__,
 				    pax_features[i].feature, file);
-			error = hbsdcontrol_rm_extattr(file, pax_features[i].extattr[disable]);
-			error |= hbsdcontrol_rm_extattr(file, pax_features[i].extattr[enable]);
+			error = hbsdcontrol_extattr_rm_attr(file, pax_features[i].extattr[disable]);
+			error |= hbsdcontrol_extattr_rm_attr(file, pax_features[i].extattr[enable]);
 
 			break;
 		}
@@ -383,7 +383,7 @@ hbsdcontrol_get_all_feature_state(const char *file, struct pax_feature_state **f
 
 	assert(*feature_states != NULL);
 
-	error = hbsdcontrol_list_extattrs(file, &attrs);
+	error = hbsdcontrol_extattr_list_attrs(file, &attrs);
 	if (attrs == NULL)
 		err(-1, "attrs == NULL");
 
@@ -391,7 +391,7 @@ hbsdcontrol_get_all_feature_state(const char *file, struct pax_feature_state **f
 		for (int attr = 0; attrs[attr] != NULL; attr++) {
 			for (pax_feature_state_t state = 0; state < 2; state++) {
 				if (!strcmp(pax_features[feature].extattr[state], attrs[attr])) {
-					hbsdcontrol_get_extattr(file, attrs[attr], &val);
+					hbsdcontrol_extattr_get_attr(file, attrs[attr], &val);
 
 					if (hbsdcontrol_debug_flag)
 						printf("%s:\t%s (%s: %d)\n",

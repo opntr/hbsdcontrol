@@ -29,10 +29,10 @@
 .Dt LIBHBSDCONTROL 3
 .Os
 .Sh NAME
-.Nm hbsdcontrol_get_extattr ,
-.Nm hbsdcontrol_set_extattr ,
-.Nm hbsdcontrol_rm_extattr ,
-.Nm hbsdcontrol_list_extattrs ,
+.Nm hbsdcontrol_extattr_get_attr ,
+.Nm hbsdcontrol_extattr_set_attr ,
+.Nm hbsdcontrol_extattr_rm_attr ,
+.Nm hbsdcontrol_extattr_list_attrs ,
 .Nm hbsdcontrol_free_extattrs ,
 .Nm hbsdcontrol_get_feature_state ,
 .Nm hbsdcontrol_set_feature_state ,
@@ -47,19 +47,19 @@
 .Sh SYNOPSIS
 .In hbsdcontrol.h
 .Ft int
-.Fo hbsdcontrol_get_extattr
+.Fo hbsdcontrol_extattr_get_attr
 .Fa "const char *file" "const char *attr" "int *val"
 .Fc
 .Ft int
-.Fo hbsdcontrol_set_extattr
+.Fo hbsdcontrol_extattr_set_attr
 .Fa "const char *file" "const char *attr" "const char int val"
 .Fc
 .Ft int
-.Fo hbsdcontrol_rm_extattr
+.Fo hbsdcontrol_extattr_rm_attr
 .Fa "const char *file" "const char *attr"
 .Fc
 .Ft int
-.Fo hbsdcontrol_list_extattrs
+.Fo hbsdcontrol_extattr_list_attrs
 .Fa "const char *file" "char ***attrs"
 .Fc
 .Ft void
@@ -98,11 +98,11 @@ library provides access to a special attributes which stored in file systems
 extended attributes.
 .Pp
 The
-.Fn hbsdcontrol_get_extattr ,
-.Fn hbsdcontrol_set_extattr ,
-.Fn hbsdcontrol_list_extattr
+.Fn hbsdcontrol_extattr_get_attr ,
+.Fn hbsdcontrol_extattr_set_attr ,
+.Fn hbsdcontrol_extattr_list_attrs
 and
-.Fn hbsdcontrol_rm_extattr
+.Fn hbsdcontrol_extattr_rm_attr
 functions are used to manipulate the low level representation of
 .Nm HardenedBSD's
 .Nm PaX
@@ -117,7 +117,7 @@ attriube will be created with the
 .Fa val
 value.
 The
-.Fn hbsdcontrol_list_extattr
+.Fn hbsdcontrol_extattr_list_attrs
 allocates the required memory for the
 .Fa "attrs"
 which should be freed after the usage with
