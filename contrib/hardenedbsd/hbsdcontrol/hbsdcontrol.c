@@ -104,6 +104,7 @@ const struct pax_feature_entry pax_features[] = {
 const char *
 hbsdcontrol_get_version(void)
 {
+
 	return hbsdcontrol_version;
 }
 
@@ -146,9 +147,8 @@ hbsdcontrol_get_extattr(const char *file, const char *attr, int *val)
 	int	attrnamespace;
 	char	*attrval = NULL;
 
-	if (val == NULL) {
+	if (val == NULL)
 		err(-1, "%s", "val");
-	}
 
 	error = extattr_string_to_namespace("system", &attrnamespace);
 	if (error)
@@ -177,7 +177,7 @@ hbsdcontrol_get_extattr(const char *file, const char *attr, int *val)
 		errx(-1, "abort");
 	}
 
-	// XXXOP
+	// XXXOP: strtol?
 	*val = *attrval - '0';
 
 	free(attrval);
@@ -291,9 +291,8 @@ hbsdcontrol_list_extattrs(const char *file, char ***attrs)
 
 out:
 	free(data);
-	if (error) {
+	if (error)
 		hbsdcontrol_free_attrs(attrs);
-	}
 
 	return (error);
 }
