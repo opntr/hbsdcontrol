@@ -54,14 +54,15 @@ struct pax_feature_state {
 
 extern const struct pax_feature_entry pax_features[];
 
-int hbsdcontrol_set_extattr(const char *file, const char *attr, const int val);
 int hbsdcontrol_get_extattr(const char *file, const char *attr, int *val);
-int hbsdcontrol_rm_extattr(const char *file, const char *attr);
+int hbsdcontrol_set_extattr(const char *file, const char *attr, const int val);
 int hbsdcontrol_list_extattrs(const char *file, char ***attrs);
-int hbsdcontrol_set_feature_state(const char *file, const char *feature, enum feature_state state);
-int hbsdcontrol_get_feature_state(const char *file, const char *feature, enum feature_state *state);
-int hbsdcontrol_rm_feature_state(const char *file, const char *feature);
+int hbsdcontrol_rm_extattr(const char *file, const char *attr);
+
+int hbsdcontrol_get_feature_state(const char *file, const char *feature, pax_feature_state_t *state);
+int hbsdcontrol_set_feature_state(const char *file, const char *feature, pax_feature_state_t state);
 int hbsdcontrol_list_features(const char *file, char **features);
+int hbsdcontrol_rm_feature_state(const char *file, const char *feature);
 
 int hbsdcontrol_set_debug(const int level);
 
