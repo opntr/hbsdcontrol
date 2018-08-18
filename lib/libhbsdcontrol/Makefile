@@ -8,8 +8,8 @@ HBSDCONTROL_DIR= ${.CURDIR}/../../contrib/hardenedbsd/hbsdcontrol
 
 #CFLAGS+= ${HBSDCONTROL_DIR}
 
-SRCS=	${HBSDCONTROL_DIR}/hbsdcontrol.c
-INCS=	${HBSDCONTROL_DIR}/hbsdcontrol.h
+SRCS=	${HBSDCONTROL_DIR}/libhbsdcontrol.c
+INCS=	${HBSDCONTROL_DIR}/libhbsdcontrol.h
 MAN+=	${HBSDCONTROL_DIR}/libhbsdcontrol.3
 MLINKS+=	libhbsdcontrol.3	hbsdcontrol_set_extattr.3
 MLINKS+=	libhbsdcontrol.3	hbsdcontrol_rm_extattr.3

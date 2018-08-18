@@ -8,7 +8,7 @@ CFLAGS+= -I${HBSDCONTROL_DIR}
 LIBADD+= sbuf
 LDADD+= -lsbuf
 
-SRCS= ${HBSDCONTROL_DIR}/main.c ${HBSDCONTROL_DIR}/hbsdcontrol.c
+SRCS= ${HBSDCONTROL_DIR}/main.c ${HBSDCONTROL_DIR}/libhbsdcontrol.c
 MAN= ${HBSDCONTROL_DIR}/hbsdcontrol.8
 
 .include <bsd.prog.mk>
