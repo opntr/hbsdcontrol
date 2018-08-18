@@ -83,6 +83,7 @@ usage(void)
 static void
 version(void)
 {
+
 	printf("hbsdcontrol version: %s\n", HBSDCONTROL_VERSION);
 	printf("libhbsdcontrol version: %s\n", hbsdcontrol_get_version());
 }
