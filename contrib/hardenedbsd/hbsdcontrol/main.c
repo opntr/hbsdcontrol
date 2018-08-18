@@ -31,22 +31,18 @@
  */
 
 #include <sys/types.h>
-#include <sys/sbuf.h>
-#include <sys/uio.h>
-#include <sys/extattr.h>
-#include <sys/stat.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <libgen.h>
-#include <libutil.h>
 #include <unistd.h>
 #include <err.h>
 #include <errno.h>
 
+#include "cmd_pax.h"
 #include "hbsdcontrol.h"
+#include "libhbsdcontrol.h"
 
 #define	HBSDCONTROL_VERSION	"v000"
 
@@ -59,22 +55,6 @@ static bool flag_version = false;
 
 static void usage(void);
 
-static int pax_cb(int *argc, char ***argv);
-static void pax_usage(bool terminate);
-static int pax_enable_cb(int *argc, char ***argv);
-static int pax_disable_cb(int *argc, char ***argv);
-static int pax_reset_cb(int *argc, char ***argv);
-static int pax_list_cb(int *argc, char ***argv);
-
-static int dummy_cb(int *argc, char ***argv);
-
-
-struct hbsdcontrol_action_entry {
-	const char	*action;
-	const int	 min_argc;
-	int		(*fn)(int *, char ***);
-};
-
 struct hbsdcontrol_command_entry {
 	const char	*cmd;
 	const int	 min_argc;
@@ -83,170 +63,10 @@ struct hbsdcontrol_command_entry {
 };
 
 const struct hbsdcontrol_command_entry hbsdcontrol_commands[] = {
-	{"pax",		3,	pax_cb,	pax_usage},
-	{NULL,		0,	NULL,	NULL},
+	{"pax",		3,	pax_cmd,	pax_usage},
+	{NULL,		0,	NULL,		NULL},
 };
 
-const struct hbsdcontrol_action_entry hbsdcontrol_pax_actions[] = {
-	{"enable",	3,	pax_enable_cb},
-	{"disable",	3,	pax_disable_cb},
-//	{"status",	3,	dummy_cb},
-	{"reset",	3,	pax_reset_cb},
-	{"sysdef",	3,	pax_reset_cb},
-//	{"reset-all",	2,	dummy_cb},
-	{"list",	2,	pax_list_cb},
-	{NULL,		0,	NULL}
-};
-
-static int
-dummy_cb(int *argc, char ***argv)
-{
-
-	errx(-1, "dummy_cb");
-}
-
-static int
-enable_disable(int *argc, char ***argv, int state)
-{
-	char *feature;
-	char *file;
-	struct stat st;
-
-	if (*argc < 3)
-		pax_usage(true);
-
-
-	feature = (*argv)[1];
-	file = (*argv)[2];
-
-	*argc -= 2;
-	*argv += 2;
-
-	if (lstat(file, &st)) {
-		fprintf(stderr, "missing file: %s\n", file);
-		return (1);
-	}
-
-	hbsdcontrol_set_feature_state(file, feature, state);
-
-	return (0);
-}
-
-static int
-pax_list(int *argc, char ***argv)
-{
-	char *file;
-	char *features;
-	struct stat st;
-
-	if (*argc < 2)
-		err(-1, "bar");
-
-
-	file = (*argv)[1];
-
-	features = NULL;
-
-	(*argc)--;
-	(*argv)--;
-
-	if (lstat(file, &st)) {
-		fprintf(stderr, "missing file: %s\n", file);
-		return (1);
-	}
-
-
-	hbsdcontrol_list_features(file, &features);
-	printf("%s", features);
-	hbsdcontrol_free_features(&features);
-
-	return (0);
-}
-
-static int
-pax_enable_cb(int *argc, char ***argv)
-{
-
-	return (enable_disable(argc, argv, enable));
-}
-
-static int
-pax_disable_cb(int *argc, char ***argv)
-{
-
-	return (enable_disable(argc, argv, disable));
-}
-
-static int
-pax_rm_fsea(int *argc, char ***argv)
-{
-	char *feature;
-	char *file;
-
-	if (*argc < 3)
-		pax_usage(true);
-
-	feature = (*argv)[1];
-	file = (*argv)[2];
-
-	(*argc) -= 2;
-	*argv += 2;
-
-	return (hbsdcontrol_rm_feature_state(file, feature));
-}
-
-static int
-pax_reset_cb(int *argc, char ***argv)
-{
-
-	return (pax_rm_fsea(argc, argv));
-}
-
-static int
-pax_list_cb(int *argc, char ***argv)
-{
-
-	return (pax_list(argc, argv));
-}
-
-static void
-pax_usage(bool terminate)
-{
-	int i;
-
-	fprintf(stderr, "usage:\n");
-	for (i = 0; hbsdcontrol_pax_actions[i].action != NULL; i++) {
-		if (hbsdcontrol_pax_actions[i].min_argc == 2)
-			fprintf(stderr, "\thbsdcontrol pax %s file\n",
-			    hbsdcontrol_pax_actions[i].action);
-		else
-			fprintf(stderr, "\thbsdcontrol pax %s feature file\n",
-			    hbsdcontrol_pax_actions[i].action);
-	}
-
-	if (terminate)
-		exit(-1);
-}
-
-static int
-pax_cb(int *argc, char ***argv)
-{
-	int i;
-
-	if (*argc < 2)
-		return (1);
-
-	for (i = 0; hbsdcontrol_pax_actions[i].action != NULL; i++) {
-		if (!strcmp(*argv[0], hbsdcontrol_pax_actions[i].action)) {
-			if (*argc < hbsdcontrol_pax_actions[i].min_argc)
-				pax_usage(true);
-
-			return (hbsdcontrol_pax_actions[i].fn(argc, argv));
-		}
-	}
-
-	return (1);
-}
 
 static void
 usage(void)
