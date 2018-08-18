@@ -1,7 +1,8 @@
 .include <bsd.own.mk>
 
-PACKAGE=	libhbsdcontrol
+PACKAGE=lib${LIB}
 LIB=	hbsdcontrol
+SHLIBDIR?= /lib
 SHLIB_MAJOR=	0
 
 HBSDCONTROL_DIR= ${.CURDIR}/../../contrib/hardenedbsd/hbsdcontrol
