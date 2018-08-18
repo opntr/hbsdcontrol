@@ -113,7 +113,7 @@ enable_disable(int *argc, char ***argv, int state)
 	struct stat st;
 
 	if (*argc < 3)
-		err(-1, "bar");
+		pax_usage(true);
 
 
 	feature = (*argv)[1];
@@ -184,7 +184,7 @@ pax_rm_fsea(int *argc, char ***argv)
 	char *file;
 
 	if (*argc < 3)
-		err(-1, "baz");
+		pax_usage(true);
 
 	feature = (*argv)[1];
 	file = (*argv)[2];
@@ -247,8 +247,6 @@ pax_cb(int *argc, char ***argv)
 
 	return (1);
 }
-
-
 
 static void
 usage(void)
@@ -323,9 +321,8 @@ main(int argc, char **argv)
 		usage();
 	}
 
-
 	if (getuid() != 0) {
-		errx(-1, "!root");
+		errx(-1, "Running this program requires root privileges.");
 	}
 
 	while (argc > 0) {
