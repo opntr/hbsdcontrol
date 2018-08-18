@@ -26,8 +26,8 @@
  * $FreeBSD$
  */
 
-#ifndef __HBSDCONTROL_H
-#define	__HBSDCONTROL_H
+#ifndef __LIBHBSDCONTROL_H
+#define	__LIBHBSDCONTROL_H
 
 enum feature_state {
 	conflict = -2,
@@ -70,4 +70,4 @@ int hbsdcontrol_set_debug(const int level);
 
 const char *hbsdcontrol_get_version(void);
 
-#endif /* __HBSDCONTROL_H */
+#endif /* __LIBHBSDCONTROL_H */

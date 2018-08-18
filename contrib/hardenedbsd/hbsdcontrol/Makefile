@@ -1,9 +1,9 @@
 PROG=	hbsdcontrol
 MAN=	hbsdcontrol.8
 
-SRCS=	main.c hbsdcontrol.c
+SRCS=	main.c libhbsdcontrol.c
 
-INCS=	hbsdcontrol.h
+INCS=	libhbsdcontrol.h
 
 LIBADD=	sbuf
 LDADD=  -lsbuf

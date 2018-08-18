@@ -42,7 +42,7 @@
 #include <err.h>
 #include <errno.h>
 
-#include "hbsdcontrol.h"
+#include "libhbsdcontrol.h"
 
 static const char *hbsdcontrol_version = "v001";
 
