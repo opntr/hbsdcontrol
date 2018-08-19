@@ -55,20 +55,6 @@ static int hbsdcontrol_debug_flag;
 
 const struct pax_feature_entry pax_features[] = {
 	{
-		.feature = "aslr",
-		.extattr = {
-			[disable] = "hbsd.pax.noaslr",
-			[enable]  = "hbsd.pax.aslr",
-		},
-	},
-	{
-		.feature = "segvguard",
-		.extattr = {
-			[disable] = "hbsd.pax.nosegvguard",
-			[enable]  = "hbsd.pax.segvguard",
-		},
-	},
-	{
 		.feature = "pageexec",
 		.extattr = {
 			[disable] = "hbsd.pax.nopageexec",
@@ -80,6 +66,20 @@ const struct pax_feature_entry pax_features[] = {
 		.extattr = {
 			[disable] = "hbsd.pax.nomprotect",
 			[enable]  = "hbsd.pax.mprotect",
+		},
+	},
+	{
+		.feature = "segvguard",
+		.extattr = {
+			[disable] = "hbsd.pax.nosegvguard",
+			[enable]  = "hbsd.pax.segvguard",
+		},
+	},
+	{
+		.feature = "aslr",
+		.extattr = {
+			[disable] = "hbsd.pax.noaslr",
+			[enable]  = "hbsd.pax.aslr",
 		},
 	},
 	{
