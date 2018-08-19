@@ -46,9 +46,9 @@ static int pax_disable_cb(int *argc, char ***argv);
 static int pax_reset_cb(int *argc, char ***argv);
 static int pax_list_cb(int *argc, char ***argv);
 
-static int dummy_cb(int *argc, char ***argv);
+static int dummy_cb(int *argc __unused, char ***argv __unused) __unused;
 
-const struct hbsdcontrol_action_entry hbsdcontrol_pax_actions[] = {
+static const struct hbsdcontrol_action_entry hbsdcontrol_pax_actions[] = {
 	{"enable",	3,	pax_enable_cb},
 	{"disable",	3,	pax_disable_cb},
 //	{"status",	3,	dummy_cb},
@@ -60,7 +60,7 @@ const struct hbsdcontrol_action_entry hbsdcontrol_pax_actions[] = {
 };
 
 static int
-dummy_cb(int *argc, char ***argv)
+dummy_cb(int *argc __unused, char ***argv __unused)
 {
 
 	errx(-1, "dummy_cb");

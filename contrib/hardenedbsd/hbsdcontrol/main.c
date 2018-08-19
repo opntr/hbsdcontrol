@@ -62,7 +62,7 @@ struct hbsdcontrol_command_entry {
 	void		(*usage)(bool);
 };
 
-const struct hbsdcontrol_command_entry hbsdcontrol_commands[] = {
+static const struct hbsdcontrol_command_entry hbsdcontrol_commands[] = {
 	{"pax",		3,	pax_cmd,	pax_usage},
 	{NULL,		0,	NULL,		NULL},
 };
