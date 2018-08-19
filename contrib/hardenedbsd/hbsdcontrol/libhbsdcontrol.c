@@ -208,13 +208,13 @@ hbsdcontrol_extattr_rm_attr(const char *file, const char *attr)
 int
 hbsdcontrol_extattr_list_attrs(const char *file, char ***attrs)
 {
+	char *data;
 	int error;
 	int attrnamespace;
 	ssize_t nbytes;
-	char *data;
-	size_t pos;
+	ssize_t pos;
 	uint8_t len;
-	int fpos;
+	unsigned int fpos;
 
 	nbytes = 0;
 	data = NULL;
@@ -427,7 +427,7 @@ hbsdcontrol_free_all_feature_state(struct pax_feature_state **feature_states)
 	if (*feature_states == NULL)
 		return;
 
-	for (int feature = 0; feature < nitems(pax_features); feature++) {
+	for (unsigned int feature = 0; feature < nitems(pax_features); feature++) {
 		free((*feature_states)[feature].feature);
 		(*feature_states)[feature].feature = NULL;
 		for (pax_feature_state_t state = 0; state < 2; state++) {
@@ -455,7 +455,7 @@ hbsdcontrol_list_features(const char *file, char **features)
 		return (1);
 
 	list = sbuf_new_auto();
-	for (int feature = 0; feature < nitems(pax_features); feature++) {
+	for (unsigned int feature = 0; feature < nitems(pax_features); feature++) {
 		if (feature_states[feature].feature == NULL)
 			continue;
 
