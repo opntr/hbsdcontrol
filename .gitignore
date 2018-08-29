@@ -10,5 +10,6 @@
 *.so
 *.so.[0-9]*
 *.swp
+.tags
 ^hbsdcontrol$
 sbin/hbsdcontrol/hbsdcontrol
